@@ -11,11 +11,10 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-datasetPath = "/media/sf_VMshare/testlandmark/"
+datasetPath = "../temp/paint_on_air/"
 imgPath = "images/"
 labelPath = "labels/"
-removedPath = "notok/"
-okPath = "ok/"
+removedPath = "noLabels.2/"
 
 def chkEnv():
     if not os.path.exists(datasetPath):
@@ -35,12 +34,6 @@ def chkEnv():
         os.makedirs(datasetPath+removedPath+"images")
         os.makedirs(datasetPath+removedPath+"labels")
         print("Create the path:", datasetPath + removedPath)
-
-    if not os.path.exists(datasetPath+okPath):
-        os.makedirs(datasetPath+okPath)
-        os.makedirs(datasetPath+okPath+"images")
-        os.makedirs(datasetPath+okPath+"labels")
-        print("Create the path:", datasetPath + okPath)
 
 
 def getLabels(imgFile, xmlFile):
@@ -74,7 +67,11 @@ def getLabels(imgFile, xmlFile):
     for elem in tmpArrays:
         labelYmax.append(int(elem.firstChild.data))
 
-    return labelName, labelXmin, labelYmin, labelXmax, labelYmax
+    print("Label count:", len(labelName))
+    if(len(labelName)>0):
+        return labelName, labelXmin, labelYmin, labelXmax, labelYmax
+    else:
+        return None, None, None, None, None
 
 #--------------------------------------------
 
@@ -89,29 +86,27 @@ for file in os.listdir(imageFolder):
 
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
         print("Processing: ", imageFolder + "/" + file)
+        image_path = imageFolder + "/" + file
 
         if not os.path.exists(datasetPath+labelPath+filename+".xml"):
+            os.rename(image_path, datasetPath+removedPath+"images/"+file)
             print("Cannot find the file {}, remove this.".format(datasetPath+labelPath+filename+".xml"))
 
         else:
-            image_path = imageFolder + "/" + file
             xml_path = datasetPath + labelPath + filename+".xml"
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
-            i = 0
             image = cv2.imread(image_path)
-            for label in labelName:
-                cv2.rectangle(image, (labelXmin[i], labelYmin[i]), (labelXmax[i], labelYmax[i]), (0,255,0), 2)
-                i += 1
-
             cv2.imshow("Image", imutils.resize(image, width=700))
-            k = cv2.waitKey(0)
+            k = cv2.waitKey(1)
 
-            if(k==110):
+            if(labelName is not None):
+                i = 0
+                for label in labelName:
+                    cv2.rectangle(image, (labelXmin[i], labelYmin[i]), (labelXmax[i], labelYmax[i]), (0,255,0), 2)
+                    i += 1
+
+            else:
                 os.rename(image_path, datasetPath+removedPath+"images/"+file)
-                os.rename(xml_path, datasetPath+removedPath+"labels/"+filename+".xml")
-                print("Moved the image and xml to ", datasetPath+removedPath)
-            elif(k==121):
-                os.rename(image_path, datasetPath+okPath+"images/"+file)
-                os.rename(xml_path, datasetPath+okPath+"labels/"+filename+".xml")
-                print("Moved the image and xml to ", datasetPath+okPath)
+                #os.rename(xml_path, datasetPath+okPath+"labels/"+filename+".xml")
+                print("Moved the image with no labels to ", datasetPath+removedPath)
