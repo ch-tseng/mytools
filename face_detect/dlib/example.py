@@ -2,6 +2,7 @@ import cv2
 import dlib
 
 detector = dlib.get_frontal_face_detector()
+dlib_detectorRatio = 1
 
 def getFaces(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
