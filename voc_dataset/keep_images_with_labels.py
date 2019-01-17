@@ -2,7 +2,7 @@
 
 import cv2
 from imutils.face_utils import rect_to_bb
-import dlib
+#import dlib
 import imutils
 import os, time
 import os.path
@@ -11,7 +11,7 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-datasetPath = "/media/sf_datasets/VOC/paint_on_air/"
+datasetPath = "/media/sf_datasets/categories/breads_POS/"
 imgPath = "images/"
 labelPath = "labels/"
 removedPath = "negatives/"
@@ -86,7 +86,7 @@ for file in os.listdir(labelFolder):
     file_extension = file_extension.lower()
 
     if(file_extension == ".xml"):
-        label_path = labelFolder + "/" + file
+        label_path = labelFolder + file
         print("Processing: ", label_path)
 
         if os.path.exists(datasetPath+imgPath+filename+".jpg") or \
@@ -114,12 +114,12 @@ for file in os.listdir(imageFolder):
     file_extension = file_extension.lower()
 
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-        print("Processing: ", imageFolder + "/" + file)
-        image_path = imageFolder + "/" + file
+        print("Processing: ", imageFolder + file)
+        image_path = imageFolder + file
 
         if not os.path.exists(datasetPath+labelPath+filename+".xml"):
             print("Cannot find the file {}, remove this.".format(datasetPath+labelPath+filename+".xml"))
-            os.rename(image_path, datasetPath+removedPath+"images/"+file)
+            os.rename(image_path, datasetPath+removedPath+file)
 
         else:
             xml_path = datasetPath + labelPath + filename+".xml"
