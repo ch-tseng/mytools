@@ -1,0 +1,10 @@
+item {
+  id: 1
+  name: 'fingertip'
+}
+
+item {
+  id: 2
+  name: 'palm'
+}
+
