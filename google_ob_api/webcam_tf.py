@@ -1,3 +1,9 @@
+#python object_detection/export_inference_graph.py \
+#    --input_type image_tensor \
+#    --pipeline_config_path /home/digits/works/Google_OB_Projects/faster_rcnn_inception_v2_coco/palm_num/faster_rcnn_inception_v2_coco.config \
+#    --trained_checkpoint_prefix /home/digits/works/Google_OB_Projects/faster_rcnn_inception_v2_coco/palm_num/training/model.ckpt-9965 \
+#    --output_directory /home/digits/works/Google_OB_Projects/faster_rcnn_inception_v2_coco/palm_num/graph
+
 import numpy as np
 import tensorflow as tf
 import cv2 as cv
