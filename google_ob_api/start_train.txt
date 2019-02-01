@@ -1,0 +1,48 @@
+
+models: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
+config: https://github.com/tensorflow/models/tree/master/research/object_detection/samples/configs
+
+1. mkdir 
+2. wget https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/samples/configs/ssd_mobilenet_v1_coco.config
+   or wget https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/samples/configs/ssd_mobilenet_v2_coco.config
+3. update the config file:
+    num_classes:2
+    batch_size:24
+
+    fine_tune_checkpoint: "ssd_mobilenet_v1_coco/model.ckpt"
+
+    train_input_reader: {  
+    tf_record_input_reader {   
+    input_path: "ssd_dataset/train.record"
+    }
+    label_map_path: "ssd_dataset/object-detection.pbtxt"
+    }
+
+    eval_input_reader: {  
+    tf_record_input_reader {
+    input_path: "ssd_dataset/test.record" 
+    }
+    label_map_path: "ssd_dataset/object-detection.pbtxt"  
+    shuffle: false
+    num_readers: 1}
+   
+    move the config file to the save folder
+4.  cd ~/works/google_obj_detection/research
+    python train.py --logtostderr --train_dir=training/ --pipeline_config_path=paint_on_air_mobilenet/ssd_mobilenet_v1_coco.config
+
+5. python object_detection/export_inference_graph.py 
+    --input_type image_tensor --pipeline_config_path paint_on_air_mobilenet/ssd_mobilenet_v1_coco.config 
+    --trained_checkpoint_prefix training/model.ckpt-1028 --output_directory training/paint_on_air_graph
+
+5. python object_detection/export_inference_graph.py     --input_type image_tensor     --pipeline_config_path /home/digits/works/pos_breads/breads_fake_POS/ssd_dataset/ssd_mobilenet_v2_coco.config     --trained_checkpoint_prefix training/model.ckpt-185469     --output_directory training/graph
+
+6. python eval.py \
+    --logtostderr \
+    --pipeline_config_path=~/works/SSD_Inception_v2/pos_breads_fake/ssd_inception_v2_coco.config \
+    --checkpoint_dir=~/works/SSD_Inception_v2/pos_breads_fake/training/ \
+    --eval_dir=~/works/SSD_Inception_v2/pos_breads_fake/eval/
+
+    #To visualize the eval results
+    tensorboard --logdir=/home/digits/works/SSD_Inception_v2/pos_breads_fake/eval/
+    #TO visualize the training results
+    tensorboard --logdir=/home/digits/works/SSD_Inception_v2/pos_breads_fake/training/
