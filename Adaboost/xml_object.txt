@@ -1,0 +1,12 @@
+	<object>
+		<name>{NAME}</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>{XMIN}</xmin>
+			<ymin>{YMIN}</ymin>
+			<xmax>{XMAX}</xmax>
+			<ymax>{YMAX}</ymax>
+		</bndbox>
+	</object>
