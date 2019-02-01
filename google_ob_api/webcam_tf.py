@@ -9,12 +9,13 @@ import tensorflow as tf
 import cv2 as cv
 import imutils
 
-model_path = "/media/sf_VMshare/palm_num/faster_rcnn/graph/frozen_inference_graph.pb"
-pbtxt_path = "/media/sf_VMshare/palm_num/faster_rcnn/object_detection.pbtxt"
-source = "0"  # "0","1".. --> webcam, or "/xx/xxxx.mp4"
+model_path = "sample/frozen_inference_graph.pb"
+pbtxt_path = "sample/object_detection.pbtxt"
+#source = "/media/sf_datasets/videos/IMG_0560.MOV"  # "0","1".. --> webcam, or "/xx/xxxx.mp4"
+source ="0"
 
-make_video = True
-make_video_path = "/media/sf_VMshare/palm_num_faster_rcnn.avi"
+make_video = False
+make_video_path = "/media/sf_datasets/output2.avi"
 
 #-----------------------------------------------------------
 
@@ -66,7 +67,7 @@ with tf.Session() as sess:
                 classId = int(out[3][0][i])
                 score = float(out[1][0][i])
                 bbox = [float(v) for v in out[2][0][i]]
-                if score > 0.5:
+                if score > 0.2:
                     x = bbox[1] * cols
                     y = bbox[0] * rows
                     right = bbox[3] * cols
@@ -76,7 +77,9 @@ with tf.Session() as sess:
 
 
             cv.imshow('TensorFlow MobileNet-SSD', imutils.resize(img, width=800))
-            videoout.write(img)
+
+            if(make_video is True):
+                videoout.write(img)
             cv.waitKey(1)
 
         else:
