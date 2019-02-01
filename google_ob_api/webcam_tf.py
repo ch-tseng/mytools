@@ -3,12 +3,14 @@ import tensorflow as tf
 import cv2 as cv
 import imutils
 
-model_path = "sample/frozen_inference_graph.pb"
-pbtxt_path = "sample/object_detection.pbtxt"
+model_path = "/media/sf_VMshare/palm_num/faster_rcnn/graph/frozen_inference_graph.pb"
+pbtxt_path = "/media/sf_VMshare/palm_num/faster_rcnn/object_detection.pbtxt"
+source = "0"  # "0","1".. --> webcam, or "/xx/xxxx.mp4"
 
-#model_path = "sample_v2/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb"
-#pbtxt_path = "sample_v2/ssd_mobilenet_v2_coco_2018_03_29.pbtxt"
+make_video = True
+make_video_path = "/media/sf_VMshare/palm_num_faster_rcnn.avi"
 
+#-----------------------------------------------------------
 
 # Read the graph.
 with tf.gfile.FastGFile(model_path, 'rb') as f:
@@ -20,9 +22,19 @@ with tf.Session() as sess:
     sess.graph.as_default()
     tf.import_graph_def(graph_def, name='')
 
-    INPUT = cv.VideoCapture(0)
+    if(len(source)==1):
+        INPUT = cv.VideoCapture(int(source))
+    else:
+        INPUT = cv.VideoCapture(source)
+
     width = int(INPUT.get(cv.CAP_PROP_FRAME_WIDTH))   # float
     height = int(INPUT.get(cv.CAP_PROP_FRAME_HEIGHT)) # float
+    print(width, height)
+
+    if make_video is True:
+        fourcc = cv.VideoWriter_fourcc(*'MJPG')
+        videoout = cv.VideoWriter(make_video_path, fourcc, 30, (width, height))
+
 
     while True:
 
@@ -56,5 +68,10 @@ with tf.Session() as sess:
                     cv.rectangle(img, (int(x), int(y)), (int(right), int(bottom)), (125, 255, 51), thickness=2)
                     print(score, x, y)
 
-        cv.imshow('TensorFlow MobileNet-SSD', imutils.resize(img, width=800))
-        cv.waitKey(1)
+
+            cv.imshow('TensorFlow MobileNet-SSD', imutils.resize(img, width=800))
+            videoout.write(img)
+            cv.waitKey(1)
+
+        else:
+            videoout.release()

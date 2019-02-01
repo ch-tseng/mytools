@@ -1,19 +1,34 @@
 #cd ~/works/opencv/samples/dnn
 #python tf_text_graph_ssd.py --input /media/sf_VMshare/Mobilenet_paint_on_air/graph/frozen_inference_graph.pb --output frozen_paint_on_air.pbtxt --config /media/sf_VMshare/Mobilenet_paint_on_air/graph/pipeline.config
+#python tf_text_graph_faster_rcnn.py --input /media/sf_VMshare/palm_num/faster_rcnn/graph/frozen_inference_graph.pb --config /media/sf_VMshare/palm_num/faster_rcnn/training/pipeline.config --output /media/sf_VMshare/palm_num/faster_rcnn/dnn/graph.pbtxt
 
 import cv2
 import imutils
 
+model_path = "/media/sf_VMshare/palm_num/faster_rcnn/graph/frozen_inference_graph.pb"
+pbtxt_path = "/media/sf_VMshare/palm_num/faster_rcnn/dnn/graph.pbtxt"
+resizeImg = 300   #width
+source = "0"  # "0","1".. --> webcam, or "/xx/xxxx.mp4"
 
-model_path = "sample/frozen_inference_graph.pb"
-pbtxt_path = "sample/frozen_paint_on_air.pbtxt"
-resizeImg = 300 #width
+make_video = True
+make_video_path = "/media/sf_VMshare/palm_num_faster_rcnn.avi"
 
+
+#----------------------------------------------------------------------------
 model = cv2.dnn.readNetFromTensorflow(model_path, pbtxt_path)
 
-camera = cv2.VideoCapture(0)
+if(len(source)==1):
+    camera = cv2.VideoCapture(int(source))
+else:
+    camera = cv2.VideoCapture(source)
+
 width = int(camera.get(cv2.CAP_PROP_FRAME_WIDTH))   # float
 height = int(camera.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
+
+if make_video is True:
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    videoout = cv2.VideoWriter(make_video_path, fourcc, 30, (width, height))
+
 grabbed = True
 
 def id_class_name(class_id, classes):
@@ -48,4 +63,9 @@ while grabbed:
                 cv2.putText(orgImg,str(class_id) ,(int(box_x), int(box_y+.05*image_height)),cv2.FONT_HERSHEY_SIMPLEX,(.005*image_width),(0, 0, 255))
 
         cv2.imshow("TEST", orgImg)
+        videoout.write(orgImg)
         cv2.waitKey(1)
+
+    else:
+        videoout.release()
+
