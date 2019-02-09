@@ -52,7 +52,7 @@ with tf.Session() as sess:
         if hasFrame:
             # Read and preprocess an image.
             if(rotate != 0):
-                img = imutils.rotate_bound(img, 90)
+                img = imutils.rotate_bound(img, rotate)
 
             rows = img.shape[0]
             cols = img.shape[1]
