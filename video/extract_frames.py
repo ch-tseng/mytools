@@ -47,5 +47,4 @@ while grabbed:
             cv2.imwrite(output_frame_path + "/" + str(I).rjust(6,"0") + ".jpg" , frame)
 
     else:
-        out.release()
         camera.release()
