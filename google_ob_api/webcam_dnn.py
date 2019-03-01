@@ -11,17 +11,19 @@
 
 import cv2
 import imutils
+import time
 
-model_path = "/media/sf_mobileNet/paint_on_air/frozen_inference_graph_456826.pb"
-pbtxt_path = "/media/sf_mobileNet/paint_on_air/dnn_paint_on_air.pbtxt"
+classList = { 1:"close", 2:"first", 3:"stretch", 4:"two" }
+model_path = "/media/sf_VMshare/hand_graph/v2/frozen_inference_graph.pb"
+pbtxt_path = "/media/sf_VMshare/hand_graph/v2/dnn_graph_v2.pbtxt"
 resizeImg = (300,300)   #width for model
 #source = "0"  # "0","1".. --> webcam, or "/xx/xxxx.mp4"
-source = "/media/sf_mobileNet/paint_on_air/IMG_0549.MOV"
+source = "/media/sf_VMshare/hand1.MOV"
 
-make_video = True
-make_video_path = "/media/sf_mobileNet/paint_on_air/dnn_paint_on_air.avi"
-rotate = 90
-display_width = 450
+make_video = False
+make_video_path = "/media/sf_VMshare/out_hand1_v2.avi"
+rotate = 180
+display_width = 600
 
 
 #----------------------------------------------------------------------------
@@ -45,6 +47,10 @@ def id_class_name(class_id, classes):
     for key,value in classes.items():
         if class_id == key:
             return value
+
+num_frames = 0
+# Start time
+start = time.time()
 
 while grabbed:
 
@@ -73,12 +79,26 @@ while grabbed:
                 box_height=detection[6] * image_height
 
                 cv2.rectangle(orgImg, (int(box_x), int(box_y)), (int(box_width), int(box_height)), (0, 255, 0), thickness=3)
-                cv2.putText(orgImg,str(int(class_id)) ,(int(box_x), int(box_y)),cv2.FONT_HERSHEY_SIMPLEX,(.002*image_width),(0, 0, 255), 3)
+                cv2.putText(orgImg,classList[int(class_id)] ,(int(box_x), int(box_y)),cv2.FONT_HERSHEY_SIMPLEX,(.001*image_width),(0, 0, 255), 3)
 
         cv2.imshow("TEST", imutils.resize(orgImg, width=display_width))
-        videoout.write(orgImg)
+        if(make_video is True):
+            videoout.write(orgImg)
+
         cv2.waitKey(1)
+        num_frames += 1
 
     else:
         if make_video is True:
             videoout.release()
+
+        # End time
+        end = time.time()
+        # Time elapsed
+
+        seconds = end - start
+        print ("Time taken : {0} seconds".format(seconds))
+ 
+        # Calculate frames per second
+        fps  = num_frames / seconds;
+        print ("Estimated frames per second : {0}".format(fps))
