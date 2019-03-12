@@ -18,7 +18,7 @@ lbl_folder = "labels"
 img_type = ".jpg"
 lbl_type = ".xml"
 
-th_variance = 300
+th_variance = 65
 #---------------------------------------------------------
 def chkFolder(path):
     if(os.path.isdir(path)):
