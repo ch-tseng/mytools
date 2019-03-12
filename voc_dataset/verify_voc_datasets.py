@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os, sys
+from xml.dom import minidom
+
+sources = []
+
+sources.append("/media/sf_datasets/images/voc/usd_dollars_v1")
+sources.append("/media/sf_datasets/images/voc/usd_dollars_v2")
+print(sources)
+
+img_folder = "images"
+lbl_folder = "labels"
+img_type = ".jpg"
+lbl_type = ".xml"
+
+#---------------------------------------------------------
+def chkFolder(path):
+    if(os.path.isdir(path)):
+        return True
+    else:
+        return False
+
+def chkEnvironment():
+    for source in sources:
+        if(chkFolder(source) is False):
+            print("[error]: source: {} is not exists".format(source))
+            sys.exit()
+
+def fileCount(path, ftype=".jpg"):
+    i = 0
+    for file in os.listdir(path):
+        filename, file_extension = os.path.splitext(file)
+        file_extension = file_extension.lower()
+
+        if(file_extension == ftype):
+            i += 1
+
+    return i
+
+def countLabels(xmlFile):
+    labelXML = minidom.parse(xmlFile)
+    labelName = []
+
+    tmpArrays = labelXML.getElementsByTagName("name")
+    for elem in tmpArrays:
+        labelName.append(str(elem.firstChild.data))
+
+    return len(labelName)
+
+def getLabels(xmlFile):
+    labelXML = minidom.parse(xmlFile)
+    labelName = []
+    labelXmin = []
+    labelYmin = []
+    labelXmax = []
+    labelYmax = []
+    totalW = 0
+    totalH = 0
+    countLabels = 0
+
+    tmpArrays = labelXML.getElementsByTagName("name")
+    for elem in tmpArrays:
+        labelName.append(str(elem.firstChild.data))
+
+    tmpArrays = labelXML.getElementsByTagName("xmin")
+    for elem in tmpArrays:
+        labelXmin.append(int(elem.firstChild.data))
+
+    tmpArrays = labelXML.getElementsByTagName("ymin")
+    for elem in tmpArrays:
+        labelYmin.append(int(elem.firstChild.data))
+
+    tmpArrays = labelXML.getElementsByTagName("xmax")
+    for elem in tmpArrays:
+        labelXmax.append(int(elem.firstChild.data))
+
+    tmpArrays = labelXML.getElementsByTagName("ymax")
+    for elem in tmpArrays:
+        labelYmax.append(int(elem.firstChild.data))
+
+    return labelName, labelXmin, labelYmin, labelXmax, labelYmax
+
+
+#---------------------------------------------------------
+errorMSG = []
+file_counts = []
+
+if __name__ == '__main__': 
+    chkEnvironment()
+
+    print('[Stage #1] 檔案數量比對----------------------------------------------')
+    total_lblfile , total_imgfile = 0, 0
+    for id, s in enumerate(sources):
+        s_count1 = fileCount(os.path.join(s, img_folder ), img_type)
+        s_count2 = fileCount(os.path.join(s, lbl_folder ), lbl_type)
+        file_counts.append( (s_count1, s_count2) )
+        total_lblfile += s_count1
+        total_imgfile += s_count2
+        print("    來源{} --> 圖片檔案數量:{}, 標記檔案數量:{}".format(id+1, s_count1, s_count2) )
+
+    if(total_imgfile / len(sources) != s_count1):
+        print("")
+        print("圖片檔案數量不一致, 請先確認。 ")
+        sys.exit()
+    if(total_lblfile / len(sources) != s_count2):
+        print("")
+        print("標記檔案數量不一致, 請先確認。 ")
+        sys.exit()
+
+
+    print('')
+    print('[Stage #2] 標記數量比對----------------------------------------------')
+    i = 0
+    err = False
+    for file in os.listdir(os.path.join(sources[0], lbl_folder)):
+        filename, file_extension = os.path.splitext(file)
+        file_extension = file_extension.lower()
+
+        if(file_extension == lbl_type):
+            labelCount = []
+
+            for id in range(0, len(sources)):
+                source_path = os.path.join(sources[id], lbl_folder, file)
+                labelCount.append(countLabels(source_path))
+
+            total = 0
+            for countNum in labelCount:
+                total += countNum
+
+            if(total/len(labelCount) != labelCount[0]):
+                i += 1
+                print("    {}) 圖檔:{} 標記數量不一致, 分別為:{}".format(i, filename+img_type, labelCount) )
+                err = True
+
+    if(err is True):
+        print("標記數量不一致, 請先確認。 ")
+        #sys.exit()
