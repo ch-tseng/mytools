@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import math
 import os, sys
 import numpy as np
 from xml.dom import minidom
 
 sources = []
 
-sources.append("/media/sf_datasets/images/voc/usd_dollars_v1")
-sources.append("/media/sf_datasets/images/voc/usd_dollars_v2")
-print(sources)
+sources.append("/media/sf_datasets/temp/orange-v1")
+sources.append("/media/sf_datasets/temp/orange-v2")
+sources.append("/media/sf_datasets/temp/orange-v3")
 
-img_folder = "images"
+
+img_folder = "/media/sf_datasets/temp/orange-v2/images/"
 lbl_folder = "labels"
 img_type = ".jpg"
 lbl_type = ".xml"
 
+th_variance = 300
 #---------------------------------------------------------
 def chkFolder(path):
     if(os.path.isdir(path)):
@@ -97,7 +100,8 @@ if __name__ == '__main__':
     print('[Stage #1] 檔案數量比對----------------------------------------------')
     total_lblfile , total_imgfile = 0, 0
     for id, s in enumerate(sources):
-        s_count1 = fileCount(os.path.join(s, img_folder ), img_type)
+        #s_count1 = fileCount(os.path.join(s, img_folder ), img_type)
+        s_count1 = fileCount(img_folder, img_type)
         s_count2 = fileCount(os.path.join(s, lbl_folder ), lbl_type)
         file_counts.append( (s_count1, s_count2) )
         total_lblfile += s_count1
@@ -175,3 +179,39 @@ if __name__ == '__main__':
                 print("    {}) 圖檔:{} 標記種類有差異:{}".format(i, filename+img_type, labelList) )
                 err = True
 
+    print('')
+    print('[Stage #4] 標記位置尺寸差異----------------------------------------------')
+    i = 0
+    err = False
+    for file in os.listdir(os.path.join(sources[0], lbl_folder)):
+        filename, file_extension = os.path.splitext(file)
+        file_extension = file_extension.lower()
+
+        if(file_extension == lbl_type):
+            labelList = []
+
+            for id in range(0, len(sources)):
+                source_path = os.path.join(sources[id], lbl_folder, file)
+                _, x1, y1, x2, y2 = getLabels(source_path)
+                labels = []
+                for ii, x in enumerate(x1):
+                    area = math.sqrt(x2[ii]-x1[ii])*(y2[ii]-y1[ii])
+                    labels.append((x1[ii]+x2[ii])/2)
+                    labels.append((y1[ii]+y2[ii])/2)
+                    labels.append(area)
+
+                nlabels = np.array(labels)
+                #print(nlabels)
+                labelList.append(labels)
+
+            nlabelList = np.array(labelList)
+            #print(nlabelList.var(), nlabelList.std())
+            try:
+                variance = np.average(np.std(nlabelList, axis=0))
+            except:
+                variance = 999999
+
+            if(variance>th_variance):
+                i += 1
+                print("    {}) 圖檔:{} 標記位置尺寸差異大:{}".format(i, filename+img_type, variance) )
+                err = True
