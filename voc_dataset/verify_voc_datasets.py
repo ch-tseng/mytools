@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, sys
+import numpy as np
 from xml.dom import minidom
 
 sources = []
@@ -40,6 +41,9 @@ def fileCount(path, ftype=".jpg"):
     return i
 
 def countLabels(xmlFile):
+    if(not os.path.isfile(xmlFile)):
+        return 0
+
     labelXML = minidom.parse(xmlFile)
     labelName = []
 
@@ -137,3 +141,37 @@ if __name__ == '__main__':
     if(err is True):
         print("標記數量不一致, 請先確認。 ")
         #sys.exit()
+
+    print('')
+    print('[Stage #3] 標記種類差異比對----------------------------------------------')
+    i = 0
+    err = False
+    for file in os.listdir(os.path.join(sources[0], lbl_folder)):
+        filename, file_extension = os.path.splitext(file)
+        file_extension = file_extension.lower()
+
+        if(file_extension == lbl_type):
+            labelList = []
+
+            for id in range(0, len(sources)):
+                source_path = os.path.join(sources[id], lbl_folder, file)
+                labelNames, _, _, _, _ = getLabels(source_path)
+                labelList.append(labelNames)
+
+            ii = 0
+            err2 = False
+            labelsGroup = []
+            for labels in labelList:
+                nlabels = sorted(labels)
+                if(ii == 0):
+                    last_labels = nlabels
+                if(nlabels == last_labels) is False:
+                    err2 = True
+
+                ii += 1
+
+            if(err2 is True):
+                i += 1
+                print("    {}) 圖檔:{} 標記種類有差異:{}".format(i, filename+img_type, labelList) )
+                err = True
+
