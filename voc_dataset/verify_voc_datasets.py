@@ -13,7 +13,7 @@ sources.append("/media/sf_datasets/temp/orange-v2")
 sources.append("/media/sf_datasets/temp/orange-v3")
 
 
-img_folder = "/media/sf_datasets/temp/orange-v2/images/"
+img_folder = "/media/sf_datasets/temp/orange-v1/images/"
 lbl_folder = "labels"
 img_type = ".jpg"
 lbl_type = ".xml"
@@ -97,7 +97,9 @@ file_counts = []
 if __name__ == '__main__': 
     chkEnvironment()
 
-    print('[Stage #1] 檔案數量比對----------------------------------------------')
+    err = False
+    print('')
+    print('[Stage #1] 標記檔案數量比對----------------------------------------------')
     total_lblfile , total_imgfile = 0, 0
     for id, s in enumerate(sources):
         #s_count1 = fileCount(os.path.join(s, img_folder ), img_type)
@@ -108,17 +110,36 @@ if __name__ == '__main__':
         total_imgfile += s_count2
         print("    來源{} --> 圖片檔案數量:{}, 標記檔案數量:{}".format(id+1, s_count1, s_count2) )
 
-    if(total_imgfile / len(sources) != s_count1):
-        print("")
-        print("圖片檔案數量不一致, 請先確認。 ")
-        sys.exit()
+    #if(total_imgfile / len(sources) != s_count1):
+    #    print("")
+    #    print("圖片檔案數量不一致, 請先確認。 ")
+    #    err = True
     if(total_lblfile / len(sources) != s_count2):
         print("")
-        print("標記檔案數量不一致, 請先確認。 ")
-        sys.exit()
+        print("    標記檔案數量不一致, 請先確認。 ")
+        err = True
 
+        for id, s in enumerate(sources):
+            print("")
+            print("    來源{}:".format(id+1) )
+            files = []
+
+            for file in os.listdir(img_folder):
+                filename, file_extension = os.path.splitext(file)
+                file_extension = file_extension.lower()
+                if( os.path.isfile(os.path.join(sources[id], lbl_folder, filename+lbl_type) ) is False):
+                    files.append(filename+lbl_type)
+
+            if(len(files)>0):
+                print("        --> 少標記檔案:")
+                print("           ", files)
+            else:
+                print("        --> 正確，標記檔案與圖片檔案一致。 ")
 
     print('')
+    if(err is True):
+        sys.exit()
+
     print('[Stage #2] 標記數量比對----------------------------------------------')
     i = 0
     err = False
