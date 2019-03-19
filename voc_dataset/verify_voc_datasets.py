@@ -18,7 +18,8 @@ lbl_folder = "labels"
 img_type = ".jpg"
 lbl_type = ".xml"
 
-th_variance = 65
+th_position = 5
+th_size = 60
 #---------------------------------------------------------
 def chkFolder(path):
     if(os.path.isdir(path)):
@@ -128,7 +129,7 @@ if __name__ == '__main__':
                 filename, file_extension = os.path.splitext(file)
                 file_extension = file_extension.lower()
                 if( os.path.isfile(os.path.join(sources[id], lbl_folder, filename+lbl_type) ) is False):
-                    files.append(filename+lbl_type)
+                    files.append(filename+img_type)
 
             if(len(files)>0):
                 print("        --> 少標記檔案:")
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     if(err is True):
         sys.exit()
 
-    print('[Stage #2] 標記數量比對----------------------------------------------')
+    print('[Stage #2] 標記名稱差異比對----------------------------------------------')
     i = 0
     err = False
     for file in os.listdir(os.path.join(sources[0], lbl_folder)):
@@ -163,9 +164,11 @@ if __name__ == '__main__':
                 print("    {}) 圖檔:{} 標記數量不一致, 分別為:{}".format(i, filename+img_type, labelCount) )
                 err = True
 
+    print("")
     if(err is True):
-        print("標記數量不一致, 請先確認。 ")
-        #sys.exit()
+        print("    標記數量不一致, 請先確認。 ")
+        print("")
+        sys.exit()
 
     print('')
     print('[Stage #3] 標記種類差異比對----------------------------------------------')
@@ -197,11 +200,21 @@ if __name__ == '__main__':
 
             if(err2 is True):
                 i += 1
-                print("    {}) 圖檔:{} 標記種類有差異:{}".format(i, filename+img_type, labelList) )
+                print("")
+                print("    {}) 圖檔:{} 標記種類有差異:".format(i, filename+img_type))
+                for id, labels in enumerate(labelList):
+                    print("          來源{}. 標記列表:{}: ".format(id, labels) )
+
                 err = True
 
+    if(err is True):
+        print("")
+        print("    以上{}個圖檔的標記名稱不一致，請先更正。".format(i))
+        print("")
+        sys.exit()
+
     print('')
-    print('[Stage #4] 標記位置尺寸差異----------------------------------------------')
+    print('[Stage #4] 標記位置差異----------------------------------------------')
     i = 0
     err = False
     for file in os.listdir(os.path.join(sources[0], lbl_folder)):
@@ -232,7 +245,49 @@ if __name__ == '__main__':
             except:
                 variance = 999999
 
-            if(variance>th_variance):
+            if(variance>th_position):
+                print("Variance:", variance)
                 i += 1
-                print("    {}) 圖檔:{} 標記位置尺寸差異大:{}".format(i, filename+img_type, variance) )
+                print("    {}) 圖檔:{} 標記位置差異大:{}".format(i, filename+img_type, variance) )
                 err = True
+
+    print('')
+    print('            標記尺寸差異----------------------------------------------')
+    i = 0
+    err = False
+    for file in os.listdir(os.path.join(sources[0], lbl_folder)):
+        filename, file_extension = os.path.splitext(file)
+        file_extension = file_extension.lower()
+
+        if(file_extension == lbl_type):
+            labelList = []
+
+            for id in range(0, len(sources)):
+                source_path = os.path.join(sources[id], lbl_folder, file)
+                _, x1, y1, x2, y2 = getLabels(source_path)
+                labels = []
+                for ii, x in enumerate(x1):
+                    area = math.sqrt(x2[ii]-x1[ii])*(y2[ii]-y1[ii])
+                    labels.append((x1[ii]+x2[ii])/2)
+                    labels.append((y1[ii]+y2[ii])/2)
+                    labels.append(area)
+
+                nlabels = np.array(labels)
+                #print(nlabels)
+                labelList.append(labels)
+
+            nlabelList = np.array(labelList)
+            #print(nlabelList.var(), nlabelList.std())
+
+            try:
+                variance = np.average(np.std(nlabelList, axis=0))
+            except:
+                variance = 999999
+
+            if(variance>th_size):
+                print("Variance:", variance)
+                i += 1
+                print("    {}) 圖檔:{} 標記尺寸差異大:{}".format(i, filename+img_type, variance) )
+                err = True
+
+            print("")
