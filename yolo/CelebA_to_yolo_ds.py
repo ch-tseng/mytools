@@ -60,8 +60,5 @@ for line in anno_file:
                 anno.append(data)
 
         if(len(anno)==5):
-            print(anno[0])
             transferYolo( anno[0], [int(anno[1]), int(anno[2]), int(anno[3]), int(anno[4]) ] )
             annotations.append(anno)
-
-print(annotations)
