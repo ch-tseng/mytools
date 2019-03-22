@@ -15,7 +15,7 @@ sources.append("/media/sf_datasets/temp/orange-v3")
 
 img_folder = "/media/sf_datasets/temp/orange-v1/images/"
 lbl_folder = "labels"
-img_type = ".jpg"
+img_type = "images"  #all types of images
 lbl_type = ".xml"
 
 th_position = 5
@@ -33,14 +33,18 @@ def chkEnvironment():
             print("[error]: source: {} is not exists".format(source))
             sys.exit()
 
-def fileCount(path, ftype=".jpg"):
+def fileCount(path, ftype):
     i = 0
     for file in os.listdir(path):
         filename, file_extension = os.path.splitext(file)
         file_extension = file_extension.lower()
 
-        if(file_extension == ftype):
-            i += 1
+        if(ftype=="images"):
+            if(file_extension in [".jpg", ".jpeg", ".png", ".bmp", "pcx"]):
+                i += 1
+        else:
+            if(file_extension == ftype):
+                i += 1
 
     return i
 
@@ -129,7 +133,7 @@ if __name__ == '__main__':
                 filename, file_extension = os.path.splitext(file)
                 file_extension = file_extension.lower()
                 if( os.path.isfile(os.path.join(sources[id], lbl_folder, filename+lbl_type) ) is False):
-                    files.append(filename+img_type)
+                    files.append(filename+file_extension)
 
             if(len(files)>0):
                 print("        --> 少標記檔案:")
@@ -161,7 +165,7 @@ if __name__ == '__main__':
 
             if(total/len(labelCount) != labelCount[0]):
                 i += 1
-                print("    {}) 圖檔:{} 標記數量不一致, 分別為:{}".format(i, filename+img_type, labelCount) )
+                print("    {}) 圖檔:{} 標記數量不一致, 分別為:{}".format(i, filename+file_extension, labelCount) )
                 err = True
 
     print("")
@@ -201,7 +205,7 @@ if __name__ == '__main__':
             if(err2 is True):
                 i += 1
                 print("")
-                print("    {}) 圖檔:{} 標記種類有差異:".format(i, filename+img_type))
+                print("    {}) 圖檔:{} 標記種類有差異:".format(i, filename+file_extension))
                 for id, labels in enumerate(labelList):
                     print("          來源{}. 標記列表:{}: ".format(id, labels) )
 
@@ -248,7 +252,7 @@ if __name__ == '__main__':
             if(variance>th_position):
                 print("Variance:", variance)
                 i += 1
-                print("    {}) 圖檔:{} 標記位置差異大:{}".format(i, filename+img_type, variance) )
+                print("    {}) 圖檔:{} 標記位置差異大:{}".format(i, filename+file_extension, variance) )
                 err = True
 
     print('')
@@ -287,7 +291,7 @@ if __name__ == '__main__':
             if(variance>th_size):
                 print("Variance:", variance)
                 i += 1
-                print("    {}) 圖檔:{} 標記尺寸差異大:{}".format(i, filename+img_type, variance) )
+                print("    {}) 圖檔:{} 標記尺寸差異大:{}".format(i, filename+file_extension, variance) )
                 err = True
 
-            print("")
+    print("")
