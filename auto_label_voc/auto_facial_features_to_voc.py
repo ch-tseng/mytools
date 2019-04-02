@@ -12,21 +12,21 @@ import numpy as np
 #-------------------------------------------
 
 mediaType = "video"  # image / video / webcamera
-imageFolder = "/media/sf_faces_dataset/auto_face/faceYolo_door/images"
-videoFile = "/media/sf_VMshare/landmark.mp4"
-videoOutFile = "/media/sf_VMshare/landmark2.avi"
+imageFolder = "/media/sf_VMShare/autoFace_dataset/images"
+videoFile = "/media/sf_VMShare/face1.mp4"
+videoOutFile = "/media/sf_VMShare/out_face1.mp4"
 
-datasetPath = "/media/sf_VMshare/testlandmark/"
+datasetPath = "/media/sf_VMShare/practice/facial"
 imgPath = "images/"
 labelPath = "labels/"
 imgType = "jpg"  # jpg, png
 
 minFaceSize = (60, 60)
 maxImageWidth = 1200
+interval_frames = 30
 
-landmarksDB = "dlib/shape_predictor_68_face_landmarks.dat"
+landmarksDB = "shape_predictor_68_face_landmarks.dat"
 dlib_detectorRatio = 2
-folderCharacter = "/"  # \\ is for windows
 xml_file = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
@@ -48,11 +48,11 @@ def chkEnv():
     if not os.path.exists(datasetPath):
         os.makedirs(datasetPath)
 
-    if not os.path.exists(datasetPath + imgPath):
-        os.makedirs(datasetPath + imgPath)
+    if not os.path.exists(os.path.join(datasetPath,imgPath)):
+        os.makedirs(os.path.join(datasetPath,imgPath))
 
-    if not os.path.exists(datasetPath + labelPath):
-        os.makedirs(datasetPath + labelPath)
+    if not os.path.exists(os.path.join(datasetPath,labelPath)):
+        os.makedirs(os.path.join(datasetPath,labelPath))
 
 def getEyebrowShapes(landmarks):
     #right eye: 17~21
@@ -171,10 +171,10 @@ def makeLabelFile(img, bboxes):
     jpgFilename = filename + "." + imgType
     xmlFilename = filename + ".xml"
 
-    cv2.imwrite(datasetPath + imgPath + jpgFilename, img)
+    cv2.imwrite(os.path.join(datasetPath, imgPath, jpgFilename), img)
 
-    xmlContent = generateXML(img, xmlFilename, datasetPath + labelPath + xmlFilename, bboxes)
-    file = open(datasetPath + labelPath + xmlFilename, "w")
+    xmlContent = generateXML(img, xmlFilename, os.path.join(datasetPath ,labelPath, xmlFilename), bboxes)
+    file = open(os.path.join(datasetPath, labelPath, xmlFilename), "w")
     file.write(xmlContent)
     file.close
 
@@ -251,9 +251,9 @@ if(mediaType=="image"):
         file_extension = file_extension.lower()
 
         if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-            print("Processing: ", imageFolder + folderCharacter + file)
+            print("Processing: ", os.path.join(imageFolder, file))
 
-            image = cv2.imread(imageFolder + folderCharacter + file)
+            image = cv2.imread(os.path.joib(imageFolder, file))
             if(image.shape[1]>maxImageWidth):
                 image = imutils.resize(image, width=maxImageWidth)
 
@@ -278,7 +278,7 @@ elif(mediaType=="video" or mediaType=="webcamera"):
     while grabbed:
         i += 1
         (grabbed, frame) = camera.read()
-        if(grabbed is True):
+        if((grabbed is True) or (i % interval_frames == 0)):
             if(frame.shape[1]>maxImageWidth):
                 frame = imutils.resize(frame, width=maxImageWidth)
 
