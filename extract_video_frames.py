@@ -11,10 +11,11 @@ import sys
 import time
 import datetime
 
-videoFile = "../paint_on_air/IMG_0547.MOV"
-framesSavePath = "frames/"
+videoFile = "/media/sf_VMShare/P1180596.MP4"
+framesSavePath = "/media/sf_VMShare/piano/"
 resizeWidth = 0
-rotate = 90
+rotate = 0
+interval = 6 #frames
 #----------------------------------------
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
@@ -22,6 +23,7 @@ if not os.path.exists(framesSavePath):
 camera = cv2.VideoCapture(videoFile)
 
 i = 0
+frameid = 0
 while(camera.isOpened()):
     (grabbed, img) = camera.read()
     if(rotate>0):
@@ -34,12 +36,16 @@ while(camera.isOpened()):
         if(k==113):
             break
 
-        filename = str(i).zfill(8)
-        filename = filename + ".jpg"
-        if(resizeWidth>0):
-            img = imutils.resize(img, width=resizeWidth)
+        if(frameid % interval == 0):
+            filename = str(i).zfill(8)
+            filename = filename + ".jpg"
 
-        cv2.imwrite(framesSavePath + filename, img)
-        print("{} saved.".format(filename))
-        i += 1
+            if(resizeWidth>0):
+                img = imutils.resize(img, width=resizeWidth)
 
+            cv2.imwrite(os.path.join(framesSavePath,filename), img)
+            print("{} saved.".format(filename))
+
+            i += 1
+
+        frameid += 1
