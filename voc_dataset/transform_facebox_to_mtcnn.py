@@ -14,8 +14,6 @@ mtcnn_label_file = "/media/sf_VMShare/mtcnn_faces.txt"
 dataset_images = "/media/sf_VMShare/Eden/20190522/image/"
 dataset_labels = "/media/sf_VMShare/Eden/20190522/50cm_500pics_result/"
 
-xml_file = "../auto_label_voc/xml_file.txt"
-object_xml_file = "../auto_label_voc/xml_object.txt"
 #-------------------------------------------
 
 def chkEnv():
@@ -25,14 +23,6 @@ def chkEnv():
 
     if(not os.path.exists(dataset_labels)):
         print("There is no such folder {}".format(dataset_labels))
-        quit()
-
-    if(not os.path.exists(xml_file)):
-        print("There is no xml file in {}".format(xml_file))
-        quit()
-
-    if(not os.path.exists(object_xml_file)):
-        print("There is no object xml file in {}".format(object_xml_file))
         quit()
 
 def getLabels(imgFile, xmlFile):
