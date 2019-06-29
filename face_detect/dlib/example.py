@@ -1,5 +1,6 @@
 import cv2
 import dlib
+from imutils import face_utils
 
 detector = dlib.get_frontal_face_detector()
 dlib_detectorRatio = 1
@@ -9,7 +10,7 @@ def getFaces(img):
     rects = detector( gray , dlib_detectorRatio)
     bboxes = []
     for faceid, rect in enumerate(rects):
-        (x, y, w, h) = rect_to_bb(rect)
+        (x, y, w, h) = face_utils.rect_to_bb(rect)
         bboxes.append((x,y,w,h))
 
     return bboxes
