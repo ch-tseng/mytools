@@ -1,0 +1,21 @@
+nano ~/.config/lxsession/LXDE-pi/autostart
+
+---------------------------------------------------------------------------
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
+point-rpi
+@lxterminal --command="/home/pi/start.sh"
+
+---------------------------------------------------------------------------
+~/start.sh
+
+#!/bin/bash
+#sleep 6
+#source /home/pi/envs/face/bin/activate
+source ~/openvino/inference_engine_vpu_arm/bin/setupvars.sh
+cd ~/openvino
+sh inference_engine_vpu_arm/install_dependencies/install_NCS_udev_rules.sh
+cd /home/pi/works/fdoor.openvino
+/home/pi/envs/face/bin/python main.py
+---------------------------------------------------------------------------
