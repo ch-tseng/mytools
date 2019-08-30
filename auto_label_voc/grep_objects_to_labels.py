@@ -138,7 +138,6 @@ if __name__ == "__main__":
                 break
 
             if(frameID % frame_interval == 0):
-                print("[FRAME #{}] labeled image:{}".format(total_frames-frameID, pic_id))
 
                 if(output_rotate is True):
                     frame = imutils.rotate(frame, rotate)
@@ -146,7 +145,7 @@ if __name__ == "__main__":
                 frame_org = frame.copy()
 
                 yolo.getObject(frame, labelWant=objects, drawBox=True, bold=2, textsize=1.2, bcolor=(0,255,0), tcolor=(0,0,255))
-                #yolo.listLabels()
+                print("[FRAME #{}] image:{} labels:{}".format(total_frames-frameID, pic_id, yolo.labelNames))
 
                 bbox_objects = {}
 
@@ -173,7 +172,6 @@ if __name__ == "__main__":
                     #print("save object file:", filename)
                     #cv2.imwrite(os.path.join(folder_path, filename), img_area)
 
-                print("    objects:", yolo.labelNames)
                 if(len(bbox_objects)>0):
                     makeLabelFile(frame_org, bbox_objects)
 
