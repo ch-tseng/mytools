@@ -10,7 +10,7 @@ yolo = opencvYOLO(modeltype="yolov3", \
     cfg="../../../darknet/cfg/yolov3.cfg")
 
 objects = ("truck", "car", "motorcycle", "bus", "bicycle")
-output_path = "/media/flash/cars_waiting/yolo_objects"
+output_path = "yolo_objects/"
 frame_interval =30
 
 inputType = "video"  # webcam, image, video
@@ -62,29 +62,32 @@ if __name__ == "__main__":
         if(video_out!=""):
             width = int(INPUT.get(cv2.CAP_PROP_FRAME_WIDTH))   # float
             height = int(INPUT.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
+            total_frames = int(INPUT.get(cv2.CAP_PROP_FRAME_COUNT))
+            input("Total frames is "+str(total_frames)+", click ENTER to start.")
 
             if(write_video is True):
                 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
                 out = cv2.VideoWriter(video_out,fourcc, int(30.0/frame_interval), (int(width),int(height)))
 
+        pic_id = 0
         frameID = 0
         obj_count = {}
 
         while True:
+            hasFrame, frame = INPUT.read()
+            if not hasFrame:
+                print("Done processing !!!")
+                break
+
             if(frameID % frame_interval == 0):
-                hasFrame, frame = INPUT.read()
                 frame_org = frame.copy()
-                # Stop the program if reached end of video
-                if not hasFrame:
-                    print("Done processing !!!")
-                    break
 
                 if(output_rotate is True):
                     frame = imutils.rotate(frame, rotate)
 
+                print("[FRAME #{}] objects:{}".format(total_frames-frameID, yolo.labelNames))
+
                 yolo.getObject(frame, labelWant=objects, drawBox=True, bold=2, textsize=1.2, bcolor=(0,255,0), tcolor=(0,0,255))
-                print ("Object counts:", yolo.objCounts)
-                #yolo.listLabels()
 
                 for i, label in enumerate(yolo.labelNames):
                     folder_path = os.path.join(output_path, label)
@@ -101,14 +104,13 @@ if __name__ == "__main__":
                     obj_count.update({label:counts})
 
                     filename = label + '_' + str(counts) + '.jpg'
-                    print("save object file:", filename)
                     cv2.imwrite(os.path.join(folder_path, filename), img_area)
 
                 #print("classIds:{}, confidences:{}, labelName:{}, bbox:{}".\
                 #    format(len(yolo.classIds), len(yolo.scores), len(yolo.labelNames), len(yolo.bbox)) )
 
                 #cv2.imshow("Frame", imutils.resize(frame, width=850))
-                frameID += 1
+                pic_id += 1
                 #fps_count(frameID)
 
                 if(write_video is True):
