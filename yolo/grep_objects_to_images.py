@@ -85,9 +85,8 @@ if __name__ == "__main__":
                 if(output_rotate is True):
                     frame = imutils.rotate(frame, rotate)
 
-                print("[FRAME #{}] objects:{}".format(total_frames-frameID, yolo.labelNames))
-
                 yolo.getObject(frame, labelWant=objects, drawBox=True, bold=2, textsize=1.2, bcolor=(0,255,0), tcolor=(0,0,255))
+                print("[FRAME #{}] objects:{}".format(total_frames-frameID, yolo.labelNames))
 
                 for i, label in enumerate(yolo.labelNames):
                     folder_path = os.path.join(output_path, label)
