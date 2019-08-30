@@ -32,8 +32,8 @@ def check_env():
     if not os.path.exists(os.path.join(datasetPath, imgPath)):
         os.makedirs(os.path.join(datasetPath, imgPath))
 
-    if not os.path.exists(os.path.join(datasetPath, labelPath)):
-        os.makedirs(os.path.join(datasetPath, labelPath))
+    if not os.path.exists(os.path.join(datasetPath, imgPath)):
+        os.makedirs(os.path.join(datasetPath, imgPath))
 
     if not os.path.exists(os.path.join(datasetPath, labelPath)):
         os.makedirs(os.path.join(datasetPath, labelPath))
