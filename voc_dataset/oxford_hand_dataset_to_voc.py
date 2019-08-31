@@ -93,17 +93,18 @@ def mat_box(mat_path):
     for pt in data_train['boxes'][0]:
         #print(pt)
         pts = []
+        print(pt)
         for i, point in enumerate(pt):
-            #print(point[0][0][0], point[0][1][0])
-            pts.append( point[0][0][0])
-            pts.append( point[0][1][0])
-            pts.append( point[0][2][0])
-            pts.append( point[0][3][0])
+            pts.append( [point[0][0][0][1], point[0][0][0][0]])
+            pts.append( [point[0][1][0][1], point[0][1][0][0]])
+            pts.append( [point[0][2][0][1], point[0][2][0][0]])
+            pts.append( [point[0][3][0][1], point[0][3][0][0]])
 
+        print(pts)
         bbox = bounding_box(pts)
         bboxes.append(bbox)
 
-    #print("BBOX:", bboxes)
+    print("BBOX:", bboxes)
     return bboxes
 
 #mat_box(os.path.join(oxford_hands_lbls_path, 'Inria_390.mat'))
