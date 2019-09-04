@@ -10,11 +10,11 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = "/media/sf_datasets/temp/breads/"
-dataset_images = "/media/sf_datasets/categories/breads_POS/images/"
-dataset_labels = "/media/sf_datasets/categories/breads_POS/labels/"
+extract_to = "/WORK1/dataset/palm_temp"
+dataset_images = "/WORK1/dataset/palm_dataset/images/"
+dataset_labels = "/WORK1/dataset/palm_dataset/labels/"
 
-folderCharacter = "/"  # \\ is for windows
+#folderCharacter = "/"  # \\ is for windows
 xml_file = "../auto_label_voc/xml_file.txt"
 object_xml_file = "../auto_label_voc/xml_object.txt"
 #-------------------------------------------
@@ -74,13 +74,13 @@ def getLabels(imgFile, xmlFile):
     return labelName, labelXmin, labelYmin, labelXmax, labelYmax
 
 def write_lale_images(label, img, saveto, filename):
-    writePath = extract_to+label
+    writePath = os.path.join(extract_to,label)
     print("WRITE:", writePath)
 
     if not os.path.exists(writePath):
         os.makedirs(writePath)
 
-    cv2.imwrite(writePath + folderCharacter + filename, img)
+    cv2.imwrite(os.path.join(writePath, filename), img)
 
 #--------------------------------------------
 
@@ -111,6 +111,6 @@ for file in os.listdir(dataset_images):
                 label_img_filename = filename + "_" + str(id) + ".jpg"
                 write_lale_images(labelName[id], label_area, extract_to, label_img_filename)
 
-            cv2.imshow("Image", imutils.resize(image, width=700))
+            #cv2.imshow("Image", imutils.resize(image, width=700))
             k = cv2.waitKey(1)
 
