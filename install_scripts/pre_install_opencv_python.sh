@@ -1,3 +1,8 @@
+sudo apt-get -y purge wolfram-engine
+sudo apt-get -y purge libreoffice*
+sudo apt-get -y clean
+sudo apt-get -y autoremove
+
 sudo apt-get install libcblas-dev -y
 sudo apt-get install libhdf5-dev -y
 sudo apt-get install libhdf5-serial-dev -y
