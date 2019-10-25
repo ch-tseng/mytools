@@ -9,6 +9,7 @@ sudo apt-get install python3-dev -y
 sudo apt-get install libhdf5-dev libhdf5-serial-dev libhdf5-103
 sudo apt-get install libjasper-dev
 sudo apt-get install libqtgui4
+sudo apt-get install libqt4-test
 
 cd ~
 wget -O opencv.zip https://github.com/opencv/opencv/archive/4.1.1.zip
