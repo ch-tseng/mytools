@@ -11,11 +11,12 @@ import sys
 import time
 import datetime
 
-videoFile = "/media/sf_VMShare/P1180596.MP4"
-framesSavePath = "/media/sf_VMShare/piano/"
+videoFile = "/Users/chtseng/works/IMG_3492.mov"
+framesSavePath = "/Users/chtseng/Downloads/vehicles"
+append_prefix_filename = "a"
 resizeWidth = 0
 rotate = 0
-interval = 6 #frames
+interval = 72 #frames
 #----------------------------------------
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
@@ -38,7 +39,7 @@ while(camera.isOpened()):
 
         if(frameid % interval == 0):
             filename = str(i).zfill(8)
-            filename = filename + ".jpg"
+            filename = append_prefix_filename + "_" + filename + ".jpg"
 
             if(resizeWidth>0):
                 img = imutils.resize(img, width=resizeWidth)

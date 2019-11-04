@@ -11,11 +11,12 @@ import sys
 import time
 import datetime
 
-videoFolder = "/media/chtseng/WIN7"
-framesSavePath = "/media/sf_VMShare/cars/"
+videoFolder = "/Users/chtseng/Library/Mobile Documents/com~apple~CloudDocs/works/Police"
+framesSavePath = "/Users/chtseng/works/temp"
+append_prefix_filename = "a"
 resizeWidth = 0
 rotate = 0
-interval = 10 #frames
+interval = 15 #frames
 #----------------------------------------
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
@@ -52,7 +53,7 @@ for vfile in os.listdir(videoFolder):
 
                 if(frameid % interval == 0):
                     filename = str(i).zfill(8)
-                    filename = filename + ".jpg"
+                    filename = append_prefix_filename + "_" + filename + ".jpg"
 
                     if(resizeWidth>0):
                         img = imutils.resize(img, width=resizeWidth)
