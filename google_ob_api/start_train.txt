@@ -28,6 +28,13 @@ config: https://github.com/tensorflow/models/tree/master/research/object_detecti
    
     move the config file to the save folder
 4.  cd ~/works/google_obj_detection/research
+    python object_detection/model_main.py  \
+        --pipeline_config_path=/home/chtseng/works/convert-model/20191106_post_training/conf/palm_ssd_mobilenet_v2.config \
+        --model_dir=/home/chtseng/works/convert-model/20191106_post_training/training/ \
+        --num_train_steps=50000 \
+        --sample_1_of_n_eval_examples=1 \
+        --alsologtostderr
+4.  (Old) cd ~/works/google_obj_detection/research
     python train.py --logtostderr --train_dir=training/ --pipeline_config_path=paint_on_air_mobilenet/ssd_mobilenet_v1_coco.config
 
 5. python object_detection/export_inference_graph.py 
@@ -46,3 +53,56 @@ config: https://github.com/tensorflow/models/tree/master/research/object_detecti
     tensorboard --logdir=/home/digits/works/SSD_Inception_v2/pos_breads_fake/eval/
     #TO visualize the training results
     tensorboard --logdir=/home/digits/works/SSD_Inception_v2/pos_breads_fake/training/
+
+-------------------------------------------------------------------------------------------
+Convert (Quntize) to INT8
+
+step 1
+export CONFIG_FILE=/home/chtseng/works/convert-model/20191028/training/pipeline.config
+export CHECKPOINT_PATH=/home/chtseng/works/convert-model/20191028/training/model.ckpt-33379
+export OUTPUT_DIR=/home/chtseng/works/convert-model/20191028/tflite
+
+step 2
+python object_detection/export_tflite_ssd_graph.py \
+--pipeline_config_path=/home/chtseng/works/convert-model/20191106_post_training/conf/palm_ssd_mobilenet_v2.config \
+--trained_checkpoint_prefix=/home/chtseng/works/convert-model/20191106_post_training/training/model.ckpt-50000 \
+--output_directory=$OUTPUT_DIR \
+--add_postprocessing_op=true
+
+step 3 --> Training aware
+bazel run -c opt tensorflow/lite/toco:toco -- \
+--input_file=/home/chtseng/works/convert-model/20191028/tflite/tflite_graph.pb \
+--output_file=/home/chtseng/works/convert-model/20191028/tflite/12_palms.tflite \
+--input_shapes=1,300,300,3 \
+--input_arrays=normalized_input_image_tensor \
+--output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+--inference_type=QUANTIZED_UINT8 \
+--mean_values=128 \
+--std_values=128 \
+--change_concat_input_ranges=false \
+--allow_custom_ops
+
+step 3 --> Post training
+ python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=/home/chtseng/works/convert-model/20191106_post_training/conf/palm_ssd_mobilenet_v2.config \
+    --trained_checkpoint_prefix=/home/chtseng/works/convert-model/20191106_post_training/training/model.ckpt-50000 \
+    --output_directory=/home/chtseng/works/convert-model/20191106_post_training/tflite/ \
+    --add_postprocessing_op=true
+
+
+
+ bazel run -c opt tensorflow/lite/toco:toco -- \
+  --input_format=TENSORFLOW_GRAPHDEF \
+  --input_file=/home/chtseng/works/convert-model/20191106_post_training/tflite/tflite_graph.pb \
+  --output_format=TFLITE \
+  --output_file=/home/chtseng/works/convert-model/20191106_post_training/tflite/12_palms_post_training.tflite \
+  --inference_type=QUANTIZED_UINT8 \
+  --input_arrays=normalized_input_image_tensor \
+  --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+  --input_shapes=1,300,300,3 \
+  --mean_values=128 \
+  --std_values=128 \
+  --default_ranges_min=0 \
+  --default_ranges_max=6 \
+  --allow_custom_ops
+
