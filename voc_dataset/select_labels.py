@@ -8,7 +8,7 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-labels_want = ["car"]
+labels_want = ["dog", "car"]
 
 source_voc_path = "/DATA1/Datasets_download/Labeled/VOC/VOC_Dataset/2007/VOCdevkit/VOC2007"
 source_images = "JPEGImages"
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                 image_path = os.path.join(imageFolder, file)
                 labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
                 img_bboxes = []
-                for label_want in labelName:
+                for i, label_want in enumerate(labelName):
                     x = int(float(labelXmin[i]))
                     y = int(float(labelYmin[i]))
                     w = int(float(labelXmax[i]))-int(float(labelXmin[i]))
