@@ -6,6 +6,8 @@ import os, glob
 
 #http://cocodataset.org/#format-data
 
+#target_class = ["car", "dog"]   #[] --> all
+target_class = []
 coco_annotations_path = "/DATA1/Datasets_download/Labeled/VOC/COCO/2014/annotations_train_valid/instances_train2014.json"
 coco_images_path = "/DATA1/Datasets_download/Labeled/VOC/COCO/2014/train2014/"
 
@@ -107,12 +109,13 @@ if __name__ == "__main__":
             for num in img_bbox_tmp:
                 img_bbox.append(int(num))
 
-            if(img_id in img_bboxes):
-                last_bbox_data = img_bboxes[img_id]
-                last_bbox_data.append((class_list[category_id], img_bbox))
-                img_bboxes.update( {img_id:last_bbox_data} )
-            else:
-                img_bboxes.update( {img_id:[(class_list[category_id], img_bbox)]} )
+            if(len(target_class)==0 or (class_list[category_id].lower() in target_class)):
+                if(img_id in img_bboxes):
+                    last_bbox_data = img_bboxes[img_id]
+                    last_bbox_data.append((class_list[category_id], img_bbox))
+                    img_bboxes.update( {img_id:last_bbox_data} )
+                else:
+                    img_bboxes.update( {img_id:[(class_list[category_id], img_bbox)]} )
 
         print("Length:", len(class_list), len(img_filename))
         for file in os.listdir(coco_images_path):
@@ -127,6 +130,4 @@ if __name__ == "__main__":
                     #print(img_bboxes)
                     if(img_id in img_bboxes):
                         bboxes = img_bboxes[img_id]
-                        print("bboxes:", bboxes)
-
                         makeLabelFile(file_name, bboxes, os.path.join(coco_images_path, file))
