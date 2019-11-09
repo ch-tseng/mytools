@@ -30,6 +30,7 @@ def writeObjects(label, bbox):
         file_content = file.read()
 
     file_updated = file_content.replace("{NAME}", label)
+    print("TEST:",bbox)
     file_updated = file_updated.replace("{XMIN}", str(bbox[0]))
     file_updated = file_updated.replace("{YMIN}", str(bbox[1]))
     file_updated = file_updated.replace("{XMAX}", str(bbox[0] + bbox[2]))
@@ -40,9 +41,9 @@ def writeObjects(label, bbox):
 def generateXML(imgfile, filename, fullpath, bboxes, imgfilename):
     xmlObject = ""
 
-    for labelName, bbox_array in bboxes.items():
-        for bbox in bbox_array:
-            xmlObject = xmlObject + writeObjects(labelName, bbox)
+    for (labelName, bbox) in bboxes:
+        #for bbox in bbox_array:
+        xmlObject = xmlObject + writeObjects(labelName, bbox)
 
     with open(xml_file) as file:
         xmlfile = file.read()
@@ -98,41 +99,34 @@ if __name__ == "__main__":
         img_bboxes = {}
         for image_data in annotations:
             img_id = image_data["image_id"]
+            category_id = image_data["category_id"]
             img_bbox_tmp = image_data["bbox"]
 
+            #convert float to int for each bbox
             img_bbox = []
             for num in img_bbox_tmp:
                 img_bbox.append(int(num))
 
             if(img_id in img_bboxes):
-                last_bbox = img_bboxes[img_id]
-                last_bbox.append(img_bbox)
-                img_bboxes.update( { img_id:last_bbox } )
+                last_bbox_data = img_bboxes[img_id]
+                last_bbox_data.append((class_list[category_id], img_bbox))
+                img_bboxes.update( {img_id:last_bbox_data} )
             else:
-                img_bboxes.update( { img_id:[img_bbox] } )
+                img_bboxes.update( {img_id:[(class_list[category_id], img_bbox)]} )
 
-        img_class = {}
-        for image_data in annotations:
-            img_id = image_data["image_id"]
-            category_id = image_data["category_id"]
-            img_class.update( { img_id:class_list[category_id] } )
-
-        print("Length:", len(class_list), len(img_filename), len(img_bboxes), len(img_class))
+        print("Length:", len(class_list), len(img_filename))
         for file in os.listdir(coco_images_path):
             file_name, file_extension = os.path.splitext(file)
 
             if(file in img_filename):
+                #print(file)
                 bbox_objects = {}
                 if(file in img_filename):
                     img_id = img_filename[file]
                     #print("img_id", img_id)
+                    #print(img_bboxes)
                     if(img_id in img_bboxes):
                         bboxes = img_bboxes[img_id]
-                        #print("bboxes:", bboxes)
+                        print("bboxes:", bboxes)
 
-                        if(img_id in img_class):
-                            classname = img_class[img_id]
-                            #print("classname:", classname)
-                            bbox_objects[img_class[img_id]] = bboxes
-
-                            makeLabelFile(file_name, bbox_objects, os.path.join(coco_images_path, file))
+                        makeLabelFile(file_name, bboxes, os.path.join(coco_images_path, file))
