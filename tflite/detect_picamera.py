@@ -32,7 +32,6 @@ import picamera
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
-
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
 
