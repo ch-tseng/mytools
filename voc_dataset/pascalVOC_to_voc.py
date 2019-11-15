@@ -8,13 +8,14 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-labels_want = ["dog", "car"]
+labels_want = ["dog"]
+pose = ["rear", "left", "right", "frontal"]  #use lower case, []--> all, ["rear", "left", "right", "frontal", "unspecified"]
 
-source_voc_path = "/DATA1/Datasets_download/Labeled/VOC/VOC_Dataset/2007/VOCdevkit/VOC2007"
+source_voc_path = "/DATA1/Datasets_download/Labeled/VOC/VOC_Dataset/2012/VOCdevkit/VOC2012/"
 source_images = "JPEGImages"
 source_labels = "Annotations"
 
-target_voc_path = "voc_coco_cars/"
+target_voc_path = "/DATA1/Datasets_mine/labeled/dog_voc"
 target_images = "images/"
 target_labels = "labels/"
 imgType = "jpg"
@@ -53,32 +54,42 @@ def getLabels(imgFile, xmlFile):
     objects = labelXML.getElementsByTagName("object")
 
     for object in objects:
+        pose_list = []
+        tmpArrays = object.getElementsByTagName("pose")
+        for id, elem in enumerate(tmpArrays):
+            pose_list.append(elem.firstChild.data)
+
         id_list = []
         tmpArrays = object.getElementsByTagName("name")
         for id, elem in enumerate(tmpArrays):
             if(str(elem.firstChild.data) in labels_want):
-                labelName.append(str(elem.firstChild.data))
                 id_list.append(id)
+                #print(xmlFile, id, pose_list, "TEST:", pose_list[id].lower())
+                if(len(pose_list)>id):
+                    if((pose_list[id].lower() in pose) and len(pose)>0):
+                        labelName.append(str(elem.firstChild.data) + "_" + pose_list[id])
+                else:
+                    labelName.append(str(elem.firstChild.data))
 
-        tmpArrays = object.getElementsByTagName("xmin")
-        for id, elem in enumerate(tmpArrays):
-            if(id in id_list):
-                labelXmin.append(int(float(elem.firstChild.data)))
+            tmpArrays = object.getElementsByTagName("xmin")
+            for id, elem in enumerate(tmpArrays):
+                if(id in id_list):
+                    labelXmin.append(int(float(elem.firstChild.data)))
 
-        tmpArrays = object.getElementsByTagName("ymin")
-        for id, elem in enumerate(tmpArrays):
-            if(id in id_list):
-                labelYmin.append(int(float(elem.firstChild.data)))
+            tmpArrays = object.getElementsByTagName("ymin")
+            for id, elem in enumerate(tmpArrays):
+                if(id in id_list):
+                    labelYmin.append(int(float(elem.firstChild.data)))
 
-        tmpArrays = object.getElementsByTagName("xmax")
-        for id, elem in enumerate(tmpArrays):
-            if(id in id_list):
-                labelXmax.append(int(float(elem.firstChild.data)))
+            tmpArrays = object.getElementsByTagName("xmax")
+            for id, elem in enumerate(tmpArrays):
+                if(id in id_list):
+                    labelXmax.append(int(float(elem.firstChild.data)))
 
-        tmpArrays = object.getElementsByTagName("ymax")
-        for id, elem in enumerate(tmpArrays):
-            if(id in id_list):
-                labelYmax.append(int(float(elem.firstChild.data)))
+            tmpArrays = object.getElementsByTagName("ymax")
+            for id, elem in enumerate(tmpArrays):
+                if(id in id_list):
+                    labelYmax.append(int(float(elem.firstChild.data)))
 
     return labelName, labelXmin, labelYmin, labelXmax, labelYmax
 
@@ -146,13 +157,11 @@ if __name__ == "__main__":
 
             xml_path = os.path.join(source_voc_path, source_labels, filename+".xml")
             
-            if not os.path.exists(xml_path):
-                print("    Cannot find the file {}".format(xml_path))
-
-            else:
+            if os.path.exists(xml_path):
                 image_path = os.path.join(imageFolder, file)
                 labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
                 img_bboxes = []
+                print(labelName, labelXmin, labelYmin, labelXmax, labelYmax)
                 for i, label_want in enumerate(labelName):
                     x = int(float(labelXmin[i]))
                     y = int(float(labelYmin[i]))
@@ -163,18 +172,3 @@ if __name__ == "__main__":
                 if(len(img_bboxes)>0):
                     print(img_bboxes)
                     makeLabelFile(filename, img_bboxes, image_path)
-
-                '''
-                img_bboxes = []
-                for label_want in labels_want:
-                    for i, s_label_name in enumerate(labelName):
-                        if(label_want.lower() == s_label_name.lower()):
-                            print(len(labelXmin), len(labels_want))
-                            x = int(float(labelXmin[i]))
-                            y = int(float(labelYmin[i]))
-                            w = int(float(labelXmax[i]))-int(float(labelXmin[i]))
-                            h = int(float(labelYmax[i]))-int(float(labelYmin[i]))
-                            img_bboxes.append( (label_want, [x,y,w,h])  )
-
-                            makeLabelFile(filename, img_bboxes, image_path)
-                '''
