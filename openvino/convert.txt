@@ -1,0 +1,18 @@
+python deployment_tools/model_optimizer/mo_tf.py \
+    --input_meta_graph /home/chtseng/works/tflite_person/training/model.ckpt-5345.meta \
+    --tensorflow_object_detection_api_pipeline_config /home/chtseng/works/tflite_person/frozen/pipeline.config \
+    --tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/ssd_v2_support.json \
+    --model_name ssd_mobilenet_OLI --output_dir /home/chtseng/works/tflite_person/openvino \
+    --data_type FP16 --input_shape [1,300,300,3] --reverse_input_channels
+
+or
+
+deployment_tools/model_optimizer/mo_tf.py \
+--input_model /home/chtseng/works/tflite_person/frozen/frozen_inference_graph.pb \
+--data_type FP16 \
+--output_dir /home/chtseng/works/tflite_person/openvino \
+--tensorflow_object_detection_api_pipeline_config /home/chtseng/works/tflite_person/frozen/pipeline.config \
+--tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/ssd_support_api_v1.14.json \
+--batch 1 
+
+** you can modify the ssd_support_api_v1.14.json file if errror, for example, Cast --> Cast_1
