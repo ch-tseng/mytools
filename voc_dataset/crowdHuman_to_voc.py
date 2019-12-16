@@ -15,6 +15,7 @@ xml_file = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #output
+skip_exists_file = True   #continue not finished works
 datasetPath = "/DATA1/Datasets_mine/labeled/crowd_human_dataset"
 imgPath = "images/"
 labelPath = "labels/"
@@ -126,6 +127,11 @@ if __name__ == "__main__":
 
         for file in os.listdir(crowdHuman_path):
             file_name, file_extension = os.path.splitext(file)
+
+            if( os.path.exists(os.path.join(datasetPath, imgPath, file_name+'.jpg')) and \
+                os.path.exists(os.path.join(datasetPath, labelPath, file_name+'.xml')) ):
+                print("{} is exists, skip this file".format(file))
+                continue
 
             if(file in img_filename):
                 #print(file)
