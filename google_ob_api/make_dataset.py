@@ -16,10 +16,11 @@ import tensorflow as tf
 
 #--------------------------------------------------------------------
 #folderCharacter = "/"  # \\ is for windows
-classList = { "palm":0 }
-xmlFolder = "/WORK1/dataset/palm_dataset/labels"
-imgFolder = "/WORK1/dataset/palm_dataset/images"
-savePath = "/WORK1/dataset/palm_dataset/ssd_dataset"
+classList = { "person_head":0, "person_vbox":1, "person_fbox":2 }
+
+xmlFolder = "/DATA1/Datasets_mine/labeled/crowd_human_dataset/labels"
+imgFolder = "/DATA1/Datasets_mine/labeled/crowd_human_dataset/images"
+savePath = "/DATA1/Datasets_mine/labeled/crowd_human_dataset/ssd_dataset"
 testRatio = 0.2
 recordTF_out = ("train.record", "test.record")
 recordTF_in = ("train.csv", "test.csv")
@@ -119,43 +120,50 @@ def split(df, group):
 
 def create_tf_example(group, path):
     with tf.gfile.GFile(os.path.join(path, '{}'.format(group.filename)), 'rb') as fid:
-        encoded_jpg = fid.read()
-    encoded_jpg_io = io.BytesIO(encoded_jpg)
-    image = Image.open(encoded_jpg_io)
-    width, height = image.size
+        if(os.path.exists(os.path.join(path, '{}'.format(group.filename)))):
+            encoded_jpg = fid.read()
 
-    filename = group.filename.encode('utf8')
-    image_format = b'jpg'
-    xmins = []
-    xmaxs = []
-    ymins = []
-    ymaxs = []
-    classes_text = []
-    classes = []
+    if(os.path.exists(os.path.join(path, '{}'.format(group.filename)))):
+        encoded_jpg_io = io.BytesIO(encoded_jpg)
+        image = Image.open(encoded_jpg_io)
+        width, height = image.size
 
-    for index, row in group.object.iterrows():
-        xmins.append(row['xmin'] / width)
-        xmaxs.append(row['xmax'] / width)
-        ymins.append(row['ymin'] / height)
-        ymaxs.append(row['ymax'] / height)
-        classes_text.append(row['class'].encode('utf8'))
-        classes.append(class_text_to_int(row['class']))
+        filename = group.filename.encode('utf8')
+        image_format = b'jpg'
+        xmins = []
+        xmaxs = []
+        ymins = []
+        ymaxs = []
+        classes_text = []
+        classes = []
 
-    tf_example = tf.train.Example(features=tf.train.Features(feature={
-        'image/height': dataset_util.int64_feature(height),
-        'image/width': dataset_util.int64_feature(width),
-        'image/filename': dataset_util.bytes_feature(filename),
-        'image/source_id': dataset_util.bytes_feature(filename),
-        'image/encoded': dataset_util.bytes_feature(encoded_jpg),
-        'image/format': dataset_util.bytes_feature(image_format),
-        'image/object/bbox/xmin': dataset_util.float_list_feature(xmins),
-        'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
-        'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
-        'image/object/bbox/ymax': dataset_util.float_list_feature(ymaxs),
-        'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
-        'image/object/class/label': dataset_util.int64_list_feature(classes),
-    }))
-    return tf_example
+        for index, row in group.object.iterrows():
+            xmins.append(row['xmin'] / width)
+            xmaxs.append(row['xmax'] / width)
+            ymins.append(row['ymin'] / height)
+            ymaxs.append(row['ymax'] / height)
+            classes_text.append(row['class'].encode('utf8'))
+            classes.append(class_text_to_int(row['class']))
+
+        tf_example = tf.train.Example(features=tf.train.Features(feature={
+            'image/height': dataset_util.int64_feature(height),
+            'image/width': dataset_util.int64_feature(width),
+            'image/filename': dataset_util.bytes_feature(filename),
+            'image/source_id': dataset_util.bytes_feature(filename),
+            'image/encoded': dataset_util.bytes_feature(encoded_jpg),
+            'image/format': dataset_util.bytes_feature(image_format),
+            'image/object/bbox/xmin': dataset_util.float_list_feature(xmins),
+            'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
+            'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
+            'image/object/bbox/ymax': dataset_util.float_list_feature(ymaxs),
+            'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
+            'image/object/class/label': dataset_util.int64_list_feature(classes),
+        }))
+
+        return tf_example
+
+    else:
+        return None
 
 #-------------------------------------------------
 #step 1: make train.csv / test.csv
@@ -251,7 +259,8 @@ for i in (0, 1):
 
     for group in grouped:
         tf_example = create_tf_example(group, imgResizedFolder)
-        writer.write(tf_example.SerializeToString())
+        if(tf_example is not None):
+            writer.write(tf_example.SerializeToString())
 
     writer.close()
     print('Successfully created the TFRecords: {}'.format(output_path))
