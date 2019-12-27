@@ -11,12 +11,12 @@ import sys
 import time
 import datetime
 
-videoFolder = "/Users/chtseng/Library/Mobile Documents/com~apple~CloudDocs/works/Police"
-framesSavePath = "/Users/chtseng/works/temp"
-append_prefix_filename = "a"
-resizeWidth = 0
+videoFolder = "/Volumes/AIDATA1/Videos/Download/new"
+framesSavePath = "/Volumes/AIDATA1/dataset_Mine/human_head"
+append_prefix_filename = "all"
+resizeWidth = 1920
 rotate = 0
-interval = 15 #frames
+interval = 5 #frames
 #----------------------------------------
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
@@ -58,8 +58,12 @@ for vfile in os.listdir(videoFolder):
                     if(resizeWidth>0):
                         img = imutils.resize(img, width=resizeWidth)
 
+                    if nor os.path.exists(extract_folder):
+                        print("make folder:", extract_folder)
+                        os.makedirs(os.path.join(extract_folder,filename))
+
                     cv2.imwrite(os.path.join(extract_folder,filename), img)
-                    print("{} saved.".format(filename))
+                    print("{} saved.".format(os.path.join(extract_folder,filename)))
 
                     i += 1
 
