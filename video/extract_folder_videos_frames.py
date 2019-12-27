@@ -55,12 +55,12 @@ for vfile in os.listdir(videoFolder):
                     filename = str(i).zfill(8)
                     filename = append_prefix_filename + "_" + filename + ".jpg"
 
-                    if(resizeWidth>0):
+                    if(resizeWidth>0 and img.shape[1]>resizeWidth):
                         img = imutils.resize(img, width=resizeWidth)
 
-                    if not os.path.exists(os.path.join(extract_folder,filename)):
+                    if not os.path.exists(extract_folder):
                         print("make folder:", extract_folder)
-                        os.makedirs(os.path.join(extract_folder,filename))
+                        os.makedirs(extract_folder)
 
                     cv2.imwrite(os.path.join(extract_folder,filename), img)
                     print("{} saved.".format(os.path.join(extract_folder,filename)))
