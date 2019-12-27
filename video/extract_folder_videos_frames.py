@@ -58,7 +58,7 @@ for vfile in os.listdir(videoFolder):
                     if(resizeWidth>0):
                         img = imutils.resize(img, width=resizeWidth)
 
-                    if not os.path.exists(extract_folder):
+                    if not os.path.exists(os.path.join(extract_folder,filename)):
                         print("make folder:", extract_folder)
                         os.makedirs(os.path.join(extract_folder,filename))
 
