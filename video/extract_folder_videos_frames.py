@@ -16,13 +16,13 @@ framesSavePath = "/Volumes/AIDATA1/dataset_Mine/human_head"
 append_prefix_filename = "all"
 resizeWidth = 1920
 rotate = 0
-interval = 5 #frames
+interval = 3*30 #frames
 #----------------------------------------
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
 
 camera = None
-for vfile in os.listdir(videoFolder):
+for id, vfile in enumerate(os.listdir(videoFolder)):
     print(vfile)
     filename, file_extension = os.path.splitext(vfile)
     file_extension = file_extension.lower()
@@ -53,7 +53,7 @@ for vfile in os.listdir(videoFolder):
 
                 if(frameid % interval == 0):
                     filename = str(i).zfill(8)
-                    filename = append_prefix_filename + "_" + filename + ".jpg"
+                    filename = append_prefix_filename + "_" + str(id) + "_" + filename + ".jpg"
 
                     if(resizeWidth>0 and img.shape[1]>resizeWidth):
                         img = imutils.resize(img, width=resizeWidth)
