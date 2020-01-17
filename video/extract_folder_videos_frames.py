@@ -11,12 +11,12 @@ import sys
 import time
 import datetime
 
-videoFolder = "/Volumes/AIDATA1/Videos/Download/new"
-framesSavePath = "/Volumes/AIDATA1/dataset_Mine/human_head"
+videoFolder = "/Volumes/AIDATA1/fruits/"
+framesSavePath = "/Volumes/AIDATA1/fakeFruits/"
 append_prefix_filename = "all"
-resizeWidth = 1920
-rotate = 0
-interval = 3*30 #frames
+resizeWidth = 0
+rotate = 270
+interval = 45 #frames
 #----------------------------------------
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
@@ -27,7 +27,7 @@ for id, vfile in enumerate(os.listdir(videoFolder)):
     filename, file_extension = os.path.splitext(vfile)
     file_extension = file_extension.lower()
 
-    if(file_extension == ".mp4" or file_extension==".avi" or file_extension==".mpeg" or file_extension==".mov"):
+    if(file_extension.lower() in [".mp4",".avi",".mpeg",".mov"]):
         if(camera is not None):
             camera.release()
 
@@ -36,11 +36,10 @@ for id, vfile in enumerate(os.listdir(videoFolder)):
         if not os.path.exists(extract_folder):
             os.makedirs(extract_folder)
 
-        grabbed = True
         i = 0
         frameid = 0
+        (grabbed, img) = camera.read()
         while(grabbed is True):
-            (grabbed, img) = camera.read()
             if(rotate>0):
                 img = imutils.rotate_bound(img, rotate)
 
@@ -68,3 +67,4 @@ for id, vfile in enumerate(os.listdir(videoFolder)):
                     i += 1
 
                 frameid += 1
+            (grabbed, img) = camera.read()
