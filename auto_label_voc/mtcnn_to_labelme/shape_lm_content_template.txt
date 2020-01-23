@@ -1,0 +1,65 @@
+    {
+      "label": "{nose}",
+      "line_color": null,
+      "fill_color": null,
+      "points": [
+        [
+          {x_nose},
+          {y_nose}
+        ]
+      ],
+      "shape_type": "point",
+      "flags": {}
+    },
+    {
+      "label": "{mouth_right}",
+      "line_color": null,
+      "fill_color": null,
+      "points": [
+        [
+          {x_mouth_right},
+          {y_mouth_right}
+        ]
+      ],
+      "shape_type": "point",
+      "flags": {}
+    },
+    {
+      "label": "{mouth_left}",
+      "line_color": null,
+      "fill_color": null,
+      "points": [
+        [
+          {x_mouth_left},
+          {y_mouth_left}
+        ]
+      ],
+      "shape_type": "point",
+      "flags": {}
+    },
+    {
+      "label": "{right_eye}",
+      "line_color": null,
+      "fill_color": null,
+      "points": [
+        [
+          {x_right_eye},
+          {y_right_eye}
+        ]
+      ],
+      "shape_type": "point",
+      "flags": {}
+    },
+    {
+      "label": "{left_eye}",
+      "line_color": null,
+      "fill_color": null,
+      "points": [
+        [
+          {x_left_eye},
+          {y_left_eye}
+        ]
+      ],
+      "shape_type": "point",
+      "flags": {}
+    }
