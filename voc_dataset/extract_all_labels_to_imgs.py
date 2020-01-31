@@ -10,9 +10,10 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = "/WORK1/dataset/palm_temp"
-dataset_images = "/WORK1/dataset/palm_dataset/images/"
-dataset_labels = "/WORK1/dataset/palm_dataset/labels/"
+extract_to = "/WORK1/dataset/palm_egohands"
+dataset_images = "/DATA1/Datasets_download/Labeled/VOC/hand_dataset/egohands/voc/palm_egohands/images/"
+dataset_labels = "/DATA1/Datasets_download/Labeled/VOC/hand_dataset/egohands/voc/palm_egohands/labels/"
+resize_to = (32, 32)
 
 #folderCharacter = "/"  # \\ is for windows
 xml_file = "../auto_label_voc/xml_file.txt"
@@ -80,6 +81,7 @@ def write_lale_images(label, img, saveto, filename):
     if not os.path.exists(writePath):
         os.makedirs(writePath)
 
+    img = cv2.resize(img, resize_to)
     cv2.imwrite(os.path.join(writePath, filename), img)
 
 #--------------------------------------------
