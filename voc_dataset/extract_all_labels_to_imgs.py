@@ -10,10 +10,10 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = "/WORK1/dataset/palm_egohands"
-dataset_images = "/DATA1/Datasets_download/Labeled/VOC/hand_dataset/egohands/voc/palm_egohands/images/"
-dataset_labels = "/DATA1/Datasets_download/Labeled/VOC/hand_dataset/egohands/voc/palm_egohands/labels/"
-resize_to = (32, 32)
+extract_to = "/Volumes/AIDATA1/dataset_Mine/fake_vegetables/extract"
+dataset_images = "/Volumes/AIDATA1/dataset_Mine/fake_vegetables/images"
+dataset_labels = "/Volumes/AIDATA1/dataset_Mine/fake_vegetables/labels"
+resize_to = None  #(32, 32)
 
 #folderCharacter = "/"  # \\ is for windows
 xml_file = "../auto_label_voc/xml_file.txt"
@@ -81,7 +81,9 @@ def write_lale_images(label, img, saveto, filename):
     if not os.path.exists(writePath):
         os.makedirs(writePath)
 
-    img = cv2.resize(img, resize_to)
+    if(resize_to is not None):
+        img = cv2.resize(img, resize_to)
+
     cv2.imwrite(os.path.join(writePath, filename), img)
 
 #--------------------------------------------
@@ -95,14 +97,14 @@ for file in os.listdir(dataset_images):
     file_extension = file_extension.lower()
 
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-        print("Processing: ", dataset_images + file)
+        print("Processing: ", os.path.join(dataset_images, file))
 
-        if not os.path.exists(dataset_labels+filename+".xml"):
-            print("Cannot find the file {} for the image.".format(dataset_labels+filename+".xml"))
+        if not os.path.exists(os.path.join(dataset_labels, filename+".xml")):
+            print("Cannot find the file {} for the image.".format(os.path.join(dataset_labels, filename+".xml")))
 
         else:
-            image_path = dataset_images + file
-            xml_path = dataset_labels + filename+".xml"
+            image_path = os.path.join(dataset_images, file)
+            xml_path = os.path.join(dataset_labels, filename+".xml")
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
             orgImage = cv2.imread(image_path)
