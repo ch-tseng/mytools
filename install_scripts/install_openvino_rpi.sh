@@ -14,6 +14,7 @@ sudo apt-get install libatlas-base-dev gfortran -y
 sudo apt-get install python3-dev -y
 sudo apt-get install libhdf5-dev
 sudo apt-get install libhdf5-serial-dev
+sudo apt-get install libjasper-dev
 wget https://bootstrap.pypa.io/get-pip.py
 sudo python3 get-pip.py
 sudo pip install virtualenv virtualenvwrapper
