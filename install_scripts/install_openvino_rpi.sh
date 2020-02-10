@@ -1,3 +1,4 @@
+sudo apt-get update
 sudo apt-get purge wolfram-engine -y
 sudo apt-get purge libreoffice*  -y
 sudo apt-get clean
@@ -11,6 +12,8 @@ sudo apt-get install libgtk-3-dev -y
 sudo apt-get install libcanberra-gtk* -y
 sudo apt-get install libatlas-base-dev gfortran -y
 sudo apt-get install python3-dev -y
+sudo apt-get install libhdf5-dev
+sudo apt-get install libhdf5-serial-dev
 wget https://bootstrap.pypa.io/get-pip.py
 sudo python3 get-pip.py
 sudo pip install virtualenv virtualenvwrapper
