@@ -17,6 +17,7 @@ sudo apt-get install libhdf5-serial-dev
 sudo apt-get install libjasper-dev
 sudo apt-get install libqtgui4
 sudo apt-get install python3-pyqt5
+sudo apt install libqt4-test
 wget https://bootstrap.pypa.io/get-pip.py
 sudo python3 get-pip.py
 sudo pip install virtualenv virtualenvwrapper
