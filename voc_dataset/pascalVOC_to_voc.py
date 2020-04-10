@@ -8,14 +8,15 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-labels_want = ["dog"]
-pose = ["rear", "left", "right", "frontal"]  #use lower case, []--> all, ["rear", "left", "right", "frontal", "unspecified"]
+labels_want = ["car", "bus", "bicycle", "motorbike", "boat", "train" ]
+#pose = ["rear", "left", "right", "frontal"]  #use lower case, []--> all, ["rear", "left", "right", "frontal", "unspecified"]
+#pose = []
 
-source_voc_path = "/DATA1/Datasets_download/Labeled/VOC/VOC_Dataset/2012/VOCdevkit/VOC2012/"
+source_voc_path = "/Volumes/AIDATA1/dataset_Downloads/Pascal_VOC/VOCdevkit/VOC2012"
 source_images = "JPEGImages"
 source_labels = "Annotations"
 
-target_voc_path = "/DATA1/Datasets_mine/labeled/dog_voc"
+target_voc_path = "/Volumes/AIDATA1/dataset_Mine/VOC_vehicles"
 target_images = "images/"
 target_labels = "labels/"
 imgType = "jpg"
@@ -52,24 +53,24 @@ def getLabels(imgFile, xmlFile):
 
     #print(xmlFile)
     objects = labelXML.getElementsByTagName("object")
-
     for object in objects:
-        pose_list = []
-        tmpArrays = object.getElementsByTagName("pose")
-        for id, elem in enumerate(tmpArrays):
-            pose_list.append(elem.firstChild.data)
+        #pose_list = []
+        #tmpArrays = object.getElementsByTagName("pose")
+        #for id, elem in enumerate(tmpArrays):
+        #    pose_list.append(elem.firstChild.data)
 
         id_list = []
         tmpArrays = object.getElementsByTagName("name")
         for id, elem in enumerate(tmpArrays):
-            if(str(elem.firstChild.data) in labels_want):
+            print(elem.firstChild.data.lower())
+            if(str(elem.firstChild.data.lower()) in labels_want):
                 id_list.append(id)
                 #print(xmlFile, id, pose_list, "TEST:", pose_list[id].lower())
-                if(len(pose_list)>id):
-                    if((pose_list[id].lower() in pose) and len(pose)>0):
-                        labelName.append(str(elem.firstChild.data) + "_" + pose_list[id])
-                else:
-                    labelName.append(str(elem.firstChild.data))
+                #if(len(pose_list)>id):
+                #    if((pose_list[id].lower() in pose) and len(pose)>0):
+                #        labelName.append(str(elem.firstChild.data) + "_" + pose_list[id])
+                #else:
+                labelName.append(str(elem.firstChild.data))
 
             tmpArrays = object.getElementsByTagName("xmin")
             for id, elem in enumerate(tmpArrays):
@@ -156,7 +157,7 @@ if __name__ == "__main__":
             #print("Processing: ", imageFolder + "/" + file)
 
             xml_path = os.path.join(source_voc_path, source_labels, filename+".xml")
-            
+            #print("      ", xml_path)
             if os.path.exists(xml_path):
                 image_path = os.path.join(imageFolder, file)
                 labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
