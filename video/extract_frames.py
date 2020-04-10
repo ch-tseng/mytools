@@ -15,16 +15,16 @@ videos = [
     #        "/media/sf_VMshare/money/IMG_2985.MOV",
     #        "/media/sf_VMshare/money/IMG_2987.MOV"
     #        "/media/sf_VMshare/money/IMG_2992.MOV"
-            "/media/sf_VMshare/money/IMG_3004.MOV"
+            "J:/iKlips Camera/CameraCapture_20200409174211_2.MOV"
 
          ]
-output_frame_path = "/media/sf_VMshare/money/images/c01a"
+output_frame_path = "K:/Datatsets/waiting/CameraCapture_20200409174211_2"
 resize_output = False
 output_resize_ratio = 0.75
 rotate_img = False
-rotate = 90
-interval_frames = 15
-
+rotate = 0
+interval_frames = 30
+prefix_char = "a_"
 #----------------------------------------------------
 
 if not os.path.exists(output_frame_path):
@@ -56,6 +56,6 @@ for video_path in videos:
 
             if(i % interval_frames == 0):
                 I += 1
-                cv2.imwrite(output_frame_path + "/" + str(I).rjust(6,"0") + ".jpg" , frame)
+                cv2.imwrite(output_frame_path + "/" + prefix_char + str(I).rjust(6,"0") + ".jpg" , frame)
 
     camera.release()
