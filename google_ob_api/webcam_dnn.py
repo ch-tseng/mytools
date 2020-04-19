@@ -13,17 +13,17 @@ import cv2
 import imutils
 import time
 
-classList = { 1:"close", 2:"first", 3:"stretch", 4:"two" }
-model_path = "/media/sf_VMshare/hand_graph/v2/frozen_inference_graph.pb"
-pbtxt_path = "/media/sf_VMshare/hand_graph/v2/dnn_graph_v2.pbtxt"
+classList = { 1:"bicycle", 2:"bus", 3:"car", 4:"motorbike", 5:"truck" }
+model_path = "dnn/frozen_inference_graph.pb"
+pbtxt_path = "dnn/dnn_vehicles_voc_coco_mine.pbtxt"
 resizeImg = (300,300)   #width for model
 #source = "0"  # "0","1".. --> webcam, or "/xx/xxxx.mp4"
-source = "/media/sf_VMshare/hand1.MOV"
+source = "../../Videos/Mine/IMG_3512.mov"
 
 make_video = False
 make_video_path = "/media/sf_VMshare/out_hand1_v2.avi"
-rotate = 180
-display_width = 600
+rotate = 0
+display_width = 800
 
 
 #----------------------------------------------------------------------------
@@ -65,22 +65,33 @@ while grabbed:
         output = model.forward()
         output[0,0,:,:].shape is (100, 7)
 
+        image_height, image_width, _ = frame.shape
+        class_ids, bboxes, confidences = [], [], []
         for detection in output[0, 0, :, :]:
             confidence = detection[2]
-            if confidence > .3:
+            if(confidence>0.2):
+                confidences.append(float(confidence))
                 class_id = detection[1]
-                #print(str(str(class_id) + " " + str(detection[2])))
-                print(detection)
+                class_ids.append(class_id)
+                #print(confidence)
+                bboxes.append((int(detection[3]*image_width), int(detection[4]*image_height), 
+                               int(detection[5]*image_width), int(detection[6]*image_height)))
 
-                image_height, image_width, _ = frame.shape
-                box_x=detection[3] * image_width
-                box_y=detection[4] * image_height
-                box_width=detection[5] * image_width
-                box_height=detection[6] * image_height
+        if(len(bboxes)>0):
+            print(bboxes, confidences)
+            idxs = cv2.dnn.NMSBoxes(bboxes, confidences, 0.2, 0.8)
+ 
+        for id in idxs:
+            idx = id[0]
+            class_id = class_ids[idx]
+            box_x=bboxes[idx][0]
+            box_y=bboxes[idx][1]
+            box_width=bboxes[idx][2]
+            box_height=bboxes[idx][3]
 
-                cv2.rectangle(orgImg, (int(box_x), int(box_y)), (int(box_width), int(box_height)), (0, 255, 0), thickness=3)
-                cv2.putText(orgImg,classList[int(class_id)] ,(int(box_x), int(box_y)),cv2.FONT_HERSHEY_SIMPLEX,(.001*image_width),(0, 0, 255), 3)
-
+            cv2.rectangle(orgImg, (int(box_x), int(box_y)), (int(box_width), int(box_height)), (0, 255, 0), thickness=3)
+            cv2.putText(orgImg,classList[int(class_id)] ,(int(box_x), int(box_y)),cv2.FONT_HERSHEY_SIMPLEX,(.001*image_width),(0, 0, 255), 3)
+        
         cv2.imshow("TEST", imutils.resize(orgImg, width=display_width))
         if(make_video is True):
             videoout.write(orgImg)
