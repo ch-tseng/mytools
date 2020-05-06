@@ -5,7 +5,7 @@ import cv2
 
 split = 0.8
 
-ds_folder = "/DATA1/Datasets_mine/labeled/VOC_COCO_Mine_vehicles_VOC/"
+ds_folder = "/DATA1/Datasets_mine/labeled/vehicles_coco_PASCAL_VOC"
 image_folder = "images"
 label_folder = "labels"
 
