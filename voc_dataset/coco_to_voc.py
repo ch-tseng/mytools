@@ -7,7 +7,7 @@ import os, glob
 #http://cocodataset.org/#format-data
 
 #target_class = ["car", "dog"]   #[] --> all
-target_class = []
+target_class = ["car", "truck", "bus", "motorcycle", "bicycle"]
 coco_annotations_path = "/DATA1/Datasets_download/Labeled/VOC/COCO/2014/annotations_train_valid/instances_train2014.json"
 coco_images_path = "/DATA1/Datasets_download/Labeled/VOC/COCO/2014/train2014/"
 
@@ -33,6 +33,11 @@ def writeObjects(label, bbox):
 
     file_updated = file_content.replace("{NAME}", label)
     print("TEST:",bbox)
+    if(bbox[0]<0): bbox[0]=0
+    if(bbox[1]<0): bbox[1]=0
+    if(bbox[2]<0): bbox[2]=0
+    if(bbox[3]<0): bbox[3]=0
+
     file_updated = file_updated.replace("{XMIN}", str(bbox[0]))
     file_updated = file_updated.replace("{YMIN}", str(bbox[1]))
     file_updated = file_updated.replace("{XMAX}", str(bbox[0] + bbox[2]))
