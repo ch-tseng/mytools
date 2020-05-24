@@ -12,8 +12,10 @@ from xml.dom import minidom
 
 want_LABEL_NAME = ["person_head", "person_vbox"]  #rename to new label name
 
-dataset_images = "F:/Datasets/crowd_human_official_voc/images"
-dataset_labels = "F:/Datasets/crowd_human_official_voc/labels"
+#dataset_images = "F:/Datasets/crowd_human_official_voc/images"
+#dataset_labels = "F:/Datasets/crowd_human_official_voc/labels"
+dataset_images = "F:/Datasets/head_body_Eden/images"
+dataset_labels = "F:/Datasets/head_body_Eden/labels"
 
 out_path = "F:/Datasets/crowndHuman_2_classes"
 imgPath = "images/"
@@ -57,6 +59,13 @@ def getLabels(imgFile, xmlFile):
     totalH = 0
     countLabels = 0
 
+    print(imgFile)
+    try:
+        (h,w,c) = cv2.imread(imgFile).shape
+    except:
+        print("Erro file")
+        return None, None, None, None, None
+
     tmpArrays = labelXML.getElementsByTagName("name")
     for elem in tmpArrays:
         labelName.append(str(elem.firstChild.data))
@@ -77,12 +86,14 @@ def getLabels(imgFile, xmlFile):
     for elem in tmpArrays:
         v = int(elem.firstChild.data)
         if(v<0): v=0
+        if(v>w): v=w
         labelXmax.append(v)
 
     tmpArrays = labelXML.getElementsByTagName("ymax")
     for elem in tmpArrays:
         v = int(elem.firstChild.data)
         if(v<0): v=0
+        if(v>h): v=h
         labelYmax.append(v)
 
     return labelName, labelXmin, labelYmin, labelXmax, labelYmax
@@ -101,7 +112,7 @@ def writeObjects(label, bbox):
 
 def generateXML(img, file_name, fullpath, bboxes):
     xmlObject = ""
-    print("BBOXES:", bboxes)
+    #print("BBOXES:", bboxes)
 
     (labelName, labelXmin, labelYmin, labelXmax, labelYmax) = bboxes
     for id in range(0, len(labelName)):
@@ -131,7 +142,7 @@ def makeDatasetFile(img, img_filename, bboxes):
     file = open(os.path.join(out_path, labelPath, xmlFilename), "w")
     file.write(xmlContent)
     file.close
-    print("write to -->", os.path.join(out_path, labelPath, xmlFilename))
+    #print("write to -->", os.path.join(out_path, labelPath, xmlFilename))
 
 #--------------------------------------------
 
@@ -144,24 +155,30 @@ for file in os.listdir(dataset_images):
     file_extension = file_extension.lower()
 
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-        print("Processing: ", os.path.join(dataset_images, file))
+        #print("Processing: ", os.path.join(dataset_images, file))
 
         if not os.path.exists(os.path.join(dataset_labels, filename+".xml")):
             print("Cannot find the file {} for the image.".format(os.path.join(dataset_labels, filename+".xml")))
 
         else:
             image_path = os.path.join(dataset_images, file)
+            #image_path = dataset_images + '/' +  file
             xml_path = os.path.join(dataset_labels, filename+".xml")
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
-            n_labels, n_xmin, n_ymin, n_xmax, n_ymax = [], [], [], [], []
-            for id, label in enumerate(labelName):
-                if(label in want_LABEL_NAME):
-                    print(label, "add to dataset")
-                    n_labels.append(label)
-                    n_xmin.append(labelXmin[id])
-                    n_ymin.append(labelYmin[id])
-                    n_xmax.append(labelXmax[id])
-                    n_ymax.append(labelYmax[id])
+            if(labelName is not None):
+                n_labels, n_xmin, n_ymin, n_xmax, n_ymax = [], [], [], [], []
+                for id, label in enumerate(labelName):
+                    if(label in want_LABEL_NAME):
+                        if(labelXmax[id]>labelXmin[id] and labelYmax[id]>labelYmin[id]):
+                            n_labels.append(label)
+                            n_xmin.append(labelXmin[id])
+                            n_ymin.append(labelYmin[id])
+                            n_xmax.append(labelXmax[id])
+                            n_ymax.append(labelYmax[id])
+                            #print(label, "add to dataset")
+                        else:
+                            print("BBOX is not valid:", (labelXmin[id], labelYmin[id], labelXmax[id], labelYmax[id] ))
 
-            makeDatasetFile(cv2.imread(image_path), file, (n_labels, n_xmin, n_ymin, n_xmax, n_ymax))
+                if(len(n_labels)>0):
+                    makeDatasetFile(cv2.imread(image_path), file, (n_labels, n_xmin, n_ymin, n_xmax, n_ymax))
