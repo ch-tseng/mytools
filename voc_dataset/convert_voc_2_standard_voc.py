@@ -5,7 +5,8 @@ import cv2
 
 split = 0.8
 
-ds_folder = "/DATA1/Datasets_mine/labeled/vehicles_coco_PASCAL_VOC"
+#this ds_folder folder will converted to PASCAL VOC format
+ds_folder = "/DATA1/Datasets_mine/labeled/12_hand_gestures_VOC/"
 image_folder = "images"
 label_folder = "labels"
 
@@ -29,6 +30,7 @@ def get_file_list_from_dir(datadir):
     data_files = []
     f = open(split_file1, "w")
 
+    id_filename = 0
     for file in os.listdir(datadir):
         filename, file_extension = os.path.splitext(file)
         file_extension = file_extension.lower()
@@ -42,9 +44,12 @@ def get_file_list_from_dir(datadir):
                     print("Read error:",os.path.join(datadir,file))
                     continue
 
-                data_files.append(filename)
-                f.write(filename + '\n')
-
+                new_filename = str(id_filename).zfill(7) + file_extension
+                os.rename( os.path.join(datadir, file), os.path.join(datadir, new_filename))
+                os.rename( os.path.join(ds_folder, "Annotations", filename+".xml"), os.path.join(ds_folder, "Annotations", str(id_filename).zfill(7)+".xml"))
+                data_files.append(new_filename)
+                f.write(new_filename + '\n')
+                id_filename += 1
             else:
                 print("Not exists:", os.path.join(ds_folder, "Annotations", filename+".xml"))
 
