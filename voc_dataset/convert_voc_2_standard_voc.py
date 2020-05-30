@@ -44,11 +44,12 @@ def get_file_list_from_dir(datadir):
                     print("Read error:",os.path.join(datadir,file))
                     continue
 
-                new_filename = str(id_filename).zfill(7) + file_extension
+                new_basename = str(id_filename).zfill(12)
+                new_filename = new_basename + file_extension
                 os.rename( os.path.join(datadir, file), os.path.join(datadir, new_filename))
-                os.rename( os.path.join(ds_folder, "Annotations", filename+".xml"), os.path.join(ds_folder, "Annotations", str(id_filename).zfill(7)+".xml"))
-                data_files.append(new_filename)
-                f.write(new_filename + '\n')
+                os.rename( os.path.join(ds_folder, "Annotations", filename+".xml"), os.path.join(ds_folder, "Annotations", str(new_basename+".xml")))
+                data_files.append(new_basename)
+                f.write(new_basename + '\n')
                 id_filename += 1
             else:
                 print("Not exists:", os.path.join(ds_folder, "Annotations", filename+".xml"))
