@@ -1,0 +1,13 @@
+
+------------------------------------------------------------------------------------------------------------------------------
+https://medium.com/analytics-vidhya/converting-a-custom-darknet-model-to-tensorflow-lite-ffdd48d58082
+https://github.com/mystic123/tensorflow-yolo-v3
+
+(need update convert_weights_pb.py for 'size', 608, 'Image size' )
+ python convert_weights_pb.py --class_names /DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/obj.names --weights_file /DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/weights/yolov3_181000.weights --data_format "NHWC"
+
+tflite_convert --graph_def_file=frozen_darknet_yolov3_model.pb --output_file=yolov3_crowd_human.tflite --input_format=TENSORFLOW_GRAPHDEF --output_format=TFLITE --input_shape=1,608,608,3 --input_array=inputs --output_array=output_boxes --inference_type=FLOAT --input_data_type=FLOAT
+
+use Netron tool to see input/output arrays from pb file
+
+------------------------------------------------------------------------------------------------------------------------
