@@ -8,7 +8,7 @@ import time
 import darknet
 import imutils
 
-detect_score = 0.25
+detect_score = 0.15
 #YOLO
 #classes = ["bicycle", "bus", "car", "motorbike", "truck" ]
 classes = ["person_head", "person_vbox" ]
@@ -18,11 +18,12 @@ classes = ["person_head", "person_vbox" ]
 #weightPath = "/DATA1/Datasets_mine/labeled/vehicles_coco_voc/yolov3_config/weights/yolov3_29000.weights"
 #metaPath = "/DATA1/Datasets_mine/labeled/vehicles_coco_voc/yolov3_config/obj.data"
 #yolov4
-configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/yolov4.cfg"
-weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights/yolov4_18000.weights"
-metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/obj.data"
+configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/yolov3-tiny.cfg"
+#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights/yolov4_18000.weights"
+weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/weights/yolov3-tiny_1480093.weights"
+metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/obj.data"
 
-media = "/DATA1/Videos/Shibuya Crossing Full HD 渋谷駅 東京.mp4"
+media = "/DATA1/Videos/EarthCam Live Times Square Crossroads Cam.mp4"
 rotate_video = 0
 write_output = True
 output_video_path = "/DATA1/Outputs/Darknet_v4_Shibuya Crossing Full HD 渋谷駅 東京.avi"
@@ -50,7 +51,7 @@ def convertBack(x, y, w, h):
     ymax = int(round(y + (h / 2)))
     return xmin, ymin, xmax, ymax
 
-def draw_boxes(image, boxes, scores, labels, colors, classes, font_size, font_border, box_border):
+def draw_boxes(image, boxes, scores, labels, colors, classes, font_size, font_border, box_border, print_labels):
     for b, class_name, s in zip(boxes, labels, scores):
 
         x, y, w, h = list(map(int, b))
@@ -67,7 +68,8 @@ def draw_boxes(image, boxes, scores, labels, colors, classes, font_size, font_bo
         ret, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_size, font_border)
         cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, box_border)
         cv2.rectangle(image, (xmin, ymax - ret[1] - baseline), (xmin + ret[0], ymax), color, -1)
-        cv2.putText(image, label, (xmin, ymax - baseline), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0, 0, 0), font_border)
+        if(print_labels is True):
+            cv2.putText(image, label, (xmin, ymax - baseline), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0, 0, 0), font_border)
 
     return image
 
@@ -174,6 +176,7 @@ def YOLO():
         darknet.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
 
         detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=detect_score)
+        print(detections)
 
         w_ratio = frame_read.shape[1] / frame_resized.shape[1]
         h_ratio = frame_read.shape[0] / frame_resized.shape[0]
@@ -206,11 +209,11 @@ def YOLO():
 
 
         #print("Drawbox:", boxes, scores, labels)
-        image = draw_boxes(frame_read, boxes, scores, labels, colors, classes, 0.65, 1, 1)
+        image = draw_boxes(frame_read, boxes, scores, labels, colors, classes, 0.65, 1, 1, False)
         #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         print(1/(time.time()-prev_time))
 
-        image = display_counts(image, txt_lines, (image.shape[1]-350, image.shape[0]-150), 1.25, (0,255,0), 2)
+        image = display_counts(image, txt_lines, (image.shape[1]-350, 50), 1.25, (0,0,0), 2)
         frame_id += 1
         #cv2.imshow('Demo', image)
         if(write_output is True):
