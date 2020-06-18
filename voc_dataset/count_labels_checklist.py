@@ -100,6 +100,7 @@ for file_id, file in tqdm(enumerate(os.listdir(dataset_images))):
 
             if(len(labelName)>0):
                 names_list = ''
+                labelName.sort()
                 for id, lname in enumerate(labelName):
                     if(id>0): 
                         names_list += ', '+lname
