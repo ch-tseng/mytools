@@ -8,25 +8,30 @@ import time
 import darknet
 import imutils
 
-detect_score = 0.15
+detect_score = 0.5
 #YOLO
 #classes = ["bicycle", "bus", "car", "motorbike", "truck" ]
 classes = ["person_head", "person_vbox" ]
 
 #yolov3
-#configPath = "/DATA1/Datasets_mine/labeled/vehicles_coco_voc/yolov3_config/yolov3.cfg"
-#weightPath = "/DATA1/Datasets_mine/labeled/vehicles_coco_voc/yolov3_config/weights/yolov3_29000.weights"
-#metaPath = "/DATA1/Datasets_mine/labeled/vehicles_coco_voc/yolov3_config/obj.data"
+#configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/yolov3.cfg"
+#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/weights/yolov3_181000.weights"
+#metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/obj.data"
+#yolov3-tiny
+#configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/yolov3-tiny.cfg"
+#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/weights/yolov3-tiny_1510093.weights"
+#metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/obj.data"
 #yolov4
-configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/yolov3-tiny.cfg"
-#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights/yolov4_18000.weights"
-weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/weights/yolov3-tiny_1480093.weights"
-metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/obj.data"
+configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/yolov4.cfg"
+weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights.v2/yolov4_18000.weights"
+#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights.v1/yolov4_24000.weights"
+metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/obj.data"
 
-media = "/DATA1/Videos/EarthCam Live Times Square Crossroads Cam.mp4"
+
+media = "/DATA1/Videos/CrowdedHuman/YOLOV5_Shibuya Crossing Full HD 渋谷駅 東京.mp4"
 rotate_video = 0
 write_output = True
-output_video_path = "/DATA1/Outputs/Darknet_v4_Shibuya Crossing Full HD 渋谷駅 東京.avi"
+output_video_path = "/DATA1/Outputs/YOLOV4_Shibuya Crossing Full HD 渋谷駅 東京.avi"
 
 #video_size = (1920, 1080)  #x,y
 video_rate = 24.0
@@ -65,11 +70,12 @@ def draw_boxes(image, boxes, scores, labels, colors, classes, font_size, font_bo
         color = colors[classes.index(class_name)]
         label = '-'.join([class_name, score])
 
-        ret, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_size, font_border)
-        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, box_border)
-        cv2.rectangle(image, (xmin, ymax - ret[1] - baseline), (xmin + ret[0], ymax), color, -1)
         if(print_labels is True):
-            cv2.putText(image, label, (xmin, ymax - baseline), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0, 0, 0), font_border)
+            ret, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_size, font_border)
+            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, box_border)
+            #cv2.rectangle(image, (xmin, ymax - ret[1] - baseline), (xmin + ret[0], ymax), color, -1)
+            cv2.rectangle(image, (xmin, ymin - ret[1] - baseline), (xmin + ret[0], ymin), color, -1)
+            cv2.putText(image, label, (xmin, ymin - baseline), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0, 0, 0), font_border)
 
     return image
 
@@ -87,8 +93,8 @@ def cvDrawBoxes(detections, img, w_r, h_r):
         cv2.putText(img,
                     detection[0].decode() +
                     " [" + str(round(detection[1] * 100, 2)) + "]",
-                    (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                    [0, 255, 0], 2)
+                    (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.42,
+                    [0, 255, 0], 1)
     return img
 
 
@@ -209,7 +215,7 @@ def YOLO():
 
 
         #print("Drawbox:", boxes, scores, labels)
-        image = draw_boxes(frame_read, boxes, scores, labels, colors, classes, 0.65, 1, 1, False)
+        image = draw_boxes(frame_read, boxes, scores, labels, colors, classes, 0.45, 1, 1, True)
         #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         print(1/(time.time()-prev_time))
 
