@@ -9,36 +9,18 @@ import darknet
 import imutils
 
 detect_score = 0.5
-#YOLO
-#classes = ["bicycle", "bus", "car", "motorbike", "truck" ]
-classes = ["person_head", "person_vbox" ]
 
-#yolov3
-#configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/yolov3.cfg"
-#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/weights/yolov3_181000.weights"
-#metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolo_config/obj.data"
-#yolov3-tiny
-#configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/yolov3-tiny.cfg"
-#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/weights/yolov3-tiny_1510093.weights"
-#metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov3-tiny_config/obj.data"
-#yolov4
+classes = ["bicycle", "bus", "car", "motorbike", "truck" ]
+colors = [[10, 211, 152], [32, 146, 218], [193, 57, 12], [1, 231, 13], [46, 154, 202]]
 configPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/yolov4.cfg"
 weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights.v2/yolov4_18000.weights"
-#weightPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/weights.v1/yolov4_24000.weights"
 metaPath = "/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/yolov4_config/obj.data"
-
 
 media = "/DATA1/Videos/CrowdedHuman/YOLOV5_Shibuya Crossing Full HD 渋谷駅 東京.mp4"
 rotate_video = 0
 write_output = True
 output_video_path = "/DATA1/Outputs/YOLOV4_Shibuya Crossing Full HD 渋谷駅 東京.avi"
-
-#video_size = (1920, 1080)  #x,y
 video_rate = 24.0
-
-#colors = [np.random.randint(0, 256, 3).tolist() for _ in range(num_classes)]
-#print("Colors:", colors)
-colors = [[10, 211, 152], [32, 146, 218], [193, 57, 12], [1, 231, 13], [46, 154, 202]]
 
 def display_counts(img, list_txt, loc, font_size, font_color, font_bold):
 
