@@ -63,7 +63,12 @@ def getLabels(img, yoloFile):
             y = int(height*float(datas[2]))
             w = int(width*float(datas[3]))
             h = int(height*float(datas[4]))
-            class_name = class_list[int(datas[0])]
+            x = int(x - w/2)
+            y = int(y - h/2)
+            try:
+                class_name = class_list[int(datas[0])]
+            except:
+                print("Error class name:", datas)
             #print("class:{} x:{}, y:{}, w:{}, h:{}".format(class_name, x, y, w, h))
 
             labelName.append(class_name)
@@ -80,7 +85,7 @@ def getLabels(img, yoloFile):
 
 def write_lale_images(label, img, saveto, filename):
     writePath = os.path.join(extract_to,label)
-    print("WRITE:", writePath)
+    #print("WRITE:", writePath)
 
     if not os.path.exists(writePath):
         os.makedirs(writePath)
@@ -88,8 +93,10 @@ def write_lale_images(label, img, saveto, filename):
     if(resize_to is not None):
         img = cv2.resize(img, resize_to)
 
-
-    cv2.imwrite(os.path.join(writePath, filename), img)
+    try:
+        cv2.imwrite(os.path.join(writePath, filename), img)
+    except:
+        print("write error: ", os.path.join(writePath, filename))
 
 #--------------------------------------------
 
@@ -102,7 +109,7 @@ for file in os.listdir(imgFolder):
     file_extension = file_extension.lower()
 
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-        print("Processing: ", os.path.join(imgFolder, file))
+        #print("Processing: ", os.path.join(imgFolder, file))
 
         if not os.path.exists(os.path.join(yoloFolder, filename+".txt")):
             print("Cannot find the file {} for the image.".format(os.path.join(yoloFolder, filename+".txt")))
@@ -112,8 +119,8 @@ for file in os.listdir(imgFolder):
             yolo_path = os.path.join(yoloFolder, filename+".txt")
             orgImage = cv2.imread(image_path)
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(orgImage, yolo_path)
-            print(orgImage.shape)
-            print(labelName, labelXmin, labelYmin, labelXmax, labelYmax)
+            #print(orgImage.shape)
+            #print(labelName, labelXmin, labelYmin, labelXmax, labelYmax)
 
             image = orgImage.copy()
             for id, label in enumerate(labelName):
