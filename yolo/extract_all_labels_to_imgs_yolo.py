@@ -12,17 +12,17 @@ from xml.dom import minidom
 #extract_to = "H:/Datasets/Weight_Vegetables/extract"
 #imgFolder = "H:/Datasets/Weight_Vegetables/images"
 #xmlFolder = "H:/Datasets/Weight_Vegetables/labels"
-extract_to = "J:/Diabnext_Ritchie/extract"
-imgFolder = "J:/Diabnext_Ritchie/images"
-yoloFolder = "J:/Diabnext_Ritchie/labels"
-class_path = "J:/Diabnext_Ritchie/labels/classes.txt"
+extract_to = "M:/Diabnext/dataset/extract"
+imgFolder = "M:/Diabnext/dataset/images"
+yoloFolder = "M:/Diabnext/dataset/labels20200709/labels"
+class_path = "M:/Diabnext/dataset/labels20200709/labels/classes.txt"
 
 resize_to = None  #(32, 32)
 
 #-------------------------------------------
 
 class_list = {}
-f = open(class_path, 'r')
+f = open(class_path, 'r',encoding="utf-8")
 line = f.readline()
 id = 0
 while line:
@@ -49,7 +49,7 @@ def chkEnv():
         quit()
 
 def getLabels(img, yoloFile):
-    f = open(yoloFile, 'r')
+    f = open(yoloFile, 'r',encoding="utf-8")
     line = f.readline()
 
     labelName, labelXmin, labelYmin, labelXmax, labelYmax = [], [], [], [], []
