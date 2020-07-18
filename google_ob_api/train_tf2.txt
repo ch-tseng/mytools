@@ -1,0 +1,27 @@
+cd models/research/
+protoc object_detection/protos/*.proto --python_out=.
+cp object_detection/packages/tf2/setup.py .
+python -m pip install .
+-----------------------------------------------------
+
+check-points fine-tune: detection or classification
+
+download pre-trained models: 
+
+  classification:
+    https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_classification_zoo.md
+
+  detection
+    https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md
+
+  update config file: copy from google_obj_detection/research/object_detection/configs/tf2/
+    train_config: {
+      fine_tune_checkpoint: "/home/chtseng/works/pre-trained_models/tf2/efficientdet_d0_coco17_tpu-32/checkpoint/ckpt-0"
+      fine_tune_checkpoint_version: V2
+      fine_tune_checkpoint_type: "detection"
+
+
+
+train:
+  python object_detection/model_main_tf2.py --pipeline_config_path=/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/ssd_dataset/ssd_efficientdet_d0_512x512_coco17_tpu-8.config --model_dir=/DATA1/Datasets_mine/labeled/crowndHuman_2_classes/train_tf2 --alsologtostderr --alsologtostderr
+
