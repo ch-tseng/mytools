@@ -10,9 +10,9 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = "/Volumes/AIDATA1/dataset_Mine/fake_vegetables/extract"
-dataset_images = "/Volumes/AIDATA1/dataset_Mine/fake_vegetables/images"
-dataset_labels = "/Volumes/AIDATA1/dataset_Mine/fake_vegetables/labels"
+extract_to = "M:/Diabnext/dataset/extract"
+dataset_images = "M:/Diabnext/dataset/images"
+dataset_labels = "M:/Diabnext/dataset/labels20200805/labels"
 resize_to = None  #(32, 32)
 
 #folderCharacter = "/"  # \\ is for windows
@@ -117,4 +117,5 @@ for file in os.listdir(dataset_images):
 
             #cv2.imshow("Image", imutils.resize(image, width=700))
             k = cv2.waitKey(1)
+
 
