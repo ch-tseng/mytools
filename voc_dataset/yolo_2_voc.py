@@ -39,7 +39,7 @@ while line:
     line = f.readline()
 f.close()
 
-print(class_list)
+#print(class_list)
 
 def chkEnv():
     if not os.path.exists(extract_to):
@@ -159,9 +159,12 @@ def makeLabelFile(filename, img, bboxes, imgfile, imgType):
     #cv2.imwrite(os.path.join(datasetPath, imgPath, jpgFilename), img)
 
     xmlContent = generateXML(imgfile, img, xmlFilename, os.path.join(target_voc_path, target_labels, xmlFilename), bboxes, jpgFilename)
-    file = open(os.path.join(target_voc_path, target_labels, xmlFilename), "w", encoding="utf-8")
-    file.write(xmlContent)
-    file.close
+    try:
+        file = open(os.path.join(target_voc_path, target_labels, xmlFilename), "w", encoding="utf-8")
+        file.write(xmlContent)
+        file.close
+    except:
+        print("Cannot write to ", os.path.join(target_voc_path, target_labels, xmlFilename))
 
 #--------------------------------------------
 
@@ -204,7 +207,7 @@ for fid, file in enumerate(os.listdir(imgFolder)):
             #cv2.imshow("Image", imutils.resize(image, width=700))
             #k = cv2.waitKey(1)
             img_bboxes = []
-            print(labelName, labelXmin, labelYmin, labelXmax, labelYmax)
+            #print(labelName, labelXmin, labelYmin, labelXmax, labelYmax)
             for i, label_want in enumerate(labelName):
                 x = int(float(labelXmin[i]))
                 y = int(float(labelYmin[i]))
