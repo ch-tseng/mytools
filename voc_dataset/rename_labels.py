@@ -11,12 +11,12 @@ from xml.dom import minidom
 #-------------------------------------------
 
 org_LABEL_NAME = "*"  #*--> all labels
-new_LABEL_NAME = "defect"  #rename to new label name
+new_LABEL_NAME = "food"  #rename to new label name
 
-dataset_images = "/home/digits/datasets/road_29190304/images/"
-dataset_labels = "/home/digits/datasets/road_29190304/labels/"
+dataset_images = "/DATA1/Datasets_projects/Diabnext/images/"
+dataset_labels = "/DATA1/Datasets_projects/Diabnext/labels/"
 
-out_path = "/home/digits/datasets/road_20190304_1_label/"
+out_path = "/DATA1/Datasets_projects/Diabnext_only_food/"
 imgPath = "images/"
 labelPath = "labels/"
 
