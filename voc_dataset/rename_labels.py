@@ -10,17 +10,18 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-org_LABEL_NAME = "*"  #*--> all labels
-new_LABEL_NAME = "food"  #rename to new label name
+org_LABEL_NAME = "*"  #*--> rename all the labels, not a specified label
+new_LABEL_NAME = "food"  #rename to this new label name
 
+#path for the dataset to be renamed
 dataset_images = "/DATA1/Datasets_projects/Diabnext/images/"
 dataset_labels = "/DATA1/Datasets_projects/Diabnext/labels/"
 
+#path for the dataset to be generated.
 out_path = "/DATA1/Datasets_projects/Diabnext_only_food/"
 imgPath = "images/"
 labelPath = "labels/"
 
-folderCharacter = "/"  # \\ is for windows
 xml_samplefile = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
@@ -31,13 +32,13 @@ def chkEnv():
         os.makedirs(out_path)
         print("no {} folder, created.".format(out_path))
 
-    if not os.path.exists(out_path + folderCharacter + imgPath):
-        os.makedirs(out_path + folderCharacter + imgPath)
-        print("no {} folder, created.".format(out_path + folderCharacter + imgPath))
+    if not os.path.exists(os.path.join(out_path, imgPath)):
+        os.makedirs(os.path.join(out_path, imgPath))
+        print("no {} folder, created.".format(os.path.join(out_path, imgPath)))
 
-    if not os.path.exists(out_path + folderCharacter + labelPath):
-        os.makedirs(out_path + folderCharacter + labelPath)
-        print("no {} folder, created.".format(out_path + folderCharacter + labelPath))
+    if not os.path.exists(os.path.join(out_path ,labelPath)):
+        os.makedirs(os.path.join(out_path ,labelPath))
+        print("no {} folder, created.".format(os.path.join(out_path ,labelPath)))
 
 
     if(not os.path.exists(dataset_images)):
