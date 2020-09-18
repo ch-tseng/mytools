@@ -74,8 +74,8 @@ class OBJTRACK:
             count_lost += 1
             if(count_lost>=th_remove_ob):
                 del obj_info[obj_name]
-
-            obj_info.update( {obj_name: [init_box, box2, count_lost] } )
+            else:
+                obj_info.update( {obj_name: [init_box, box2, count_lost] } )
 
         for oid, box in enumerate(bboxes):
             min_dist, min_idname = 1.0, None
