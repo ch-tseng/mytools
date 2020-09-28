@@ -68,14 +68,18 @@ class OBJTRACK:
         self.th_iou = th_iou
         obj_info_new, min_idname, min_box = {}, None, None
         update_bboxes = []
-
+        
+        remove_item = []
         for obj_name in obj_info:
             [init_box, box2, count_lost] = obj_info[obj_name]
             count_lost += 1
             if(count_lost>=th_remove_ob):
-                del obj_info[obj_name]
-
+                remove_item.append(obj_name)
+                
             obj_info.update( {obj_name: [init_box, box2, count_lost] } )
+
+        for obj_name in remove_item:
+            del obj_info[obj_name]
 
         for oid, box in enumerate(bboxes):
             min_dist, min_idname = 1.0, None
