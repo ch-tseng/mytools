@@ -12,12 +12,13 @@ from xml.dom import minidom
 
 #org_LABEL_NAME = "minibuss"  #*--> all labels
 #new_LABEL_NAME = "bus"  #rename to new label name
+LABEL_UPDATE = False
 LABEL_NAME_UPDATE = { "I":"1", "O":"0", "Z":"2", "B":"8" }
 
-dataset_images = "D:/works/car_plate_easyocr/img_plates"
-dataset_labels = "D:/works/car_plate_easyocr/img_labels"
+dataset_images = "D:/works/car_plate_chars/images"
+dataset_labels = "D:/works/car_plate_chars/labels"
 
-out_path = "D:/works/car_plate_chars"
+out_path = "D:/works/car_plate_chars_20201026_2"
 imgPath = "images/"
 labelPath = "labels/"
 
@@ -148,10 +149,11 @@ for file in os.listdir(dataset_images):
             xml_path = os.path.join(dataset_labels, filename+".xml")
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
-            for id, label in enumerate(labelName):
-                for oid, old_label in enumerate(LABEL_NAME_UPDATE):
-                    if(label.lower()==old_label.lower()):
-                        labelName[id] = LABEL_NAME_UPDATE[old_label]
+            if(LABEL_UPDATE is True):
+                for id, label in enumerate(labelName):
+                    for oid, old_label in enumerate(LABEL_NAME_UPDATE):
+                        if(label.lower()==old_label.lower()):
+                            labelName[id] = LABEL_NAME_UPDATE[old_label]
 
             err = False
             try:
