@@ -6,13 +6,13 @@ import time
 import os, glob
 
 
-label_name = 'airplane'
-lasot_1_class_path = '/WORK1/MyProjects/my_tracking_cnn/dataset/LaSOT/airplane/'
+label_name = 'hand'
+lasot_1_class_path = 'H:/Dataset/Download/Combination/LaSOT(Large-scale_Single_Object_Tracking)/drone/'
 xml_file = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #output
-datasetPath = "/WORK1/MyProjects/my_tracking_cnn/dataset/LaSOT_voc/airplane"
+datasetPath = "D:/temp2/LaSOT_voc/drone"
 imgPath = "images/"
 labelPath = "labels/"
 imgType = "jpg"  # jpg, png
