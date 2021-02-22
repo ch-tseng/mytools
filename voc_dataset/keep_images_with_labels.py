@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import cv2
+import shutil
 from imutils.face_utils import rect_to_bb
 #import dlib
 import imutils
@@ -11,10 +12,12 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-datasetPath = "/media/sf_datasets/categories/breads_POS/"
+datasetPath = "C:/Users/ch.tseng/iCloudDrive/Model_Sale/Forklift/dataset/voc/"
 imgPath = "images/"
 labelPath = "labels/"
-removedPath = "negatives/"
+removedPath = "None/"
+rename_files = True
+newPath = "C:/Users/ch.tseng/iCloudDrive/Model_Sale/Forklift/dataset/voc2/"
 
 def chkEnv():
     if not os.path.exists(datasetPath):
@@ -35,6 +38,10 @@ def chkEnv():
         os.makedirs(datasetPath+removedPath+"labels")
         print("Create the path:", datasetPath + removedPath)
 
+    if (rename_files is True):
+        if not os.path.exists(newPath):
+            os.makedirs(os.path.join(newPath,"images"))
+            os.makedirs(os.path.join(newPath,"labels"))
 
 def getLabels(xmlFile):
     labelXML = minidom.parse(xmlFile)
@@ -109,6 +116,7 @@ for file in os.listdir(labelFolder):
             os.rename(label_path, datasetPath+removedPath+"labels/"+file)
 
 
+id = 0
 for file in os.listdir(imageFolder):
     filename, file_extension = os.path.splitext(file)
     file_extension = file_extension.lower()
@@ -127,12 +135,17 @@ for file in os.listdir(imageFolder):
             image = cv2.imread(image_path)
 
             if(labelName is not None):
+                id += 1
                 i = 0
                 for label in labelName:
                     cv2.imshow("Image", imutils.resize(image, width=700))
                     cv2.rectangle(image, (labelXmin[i], labelYmin[i]), (labelXmax[i], labelYmax[i]), (0,255,0), 2)
                     k = cv2.waitKey(1)
                     i += 1
+
+                newname = str(id).zfill(8)
+                cv2.imwrite(os.path.join(newPath,"images", newname+'.jpg'), image)
+                shutil.copy2(xml_path, os.path.join(newPath,"labels", newname+'.xml'))
 
             else:
                 print("Moved the image with no labels to ", datasetPath+removed)
