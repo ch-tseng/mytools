@@ -17,7 +17,7 @@ imgPath = "images/"
 labelPath = "labels/"
 removedPath = "None/"
 rename_files = True
-newPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\final"
+newPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\final"
 
 datasetPath = datasetPath.replace('\\', '/')
 print(datasetPath)
@@ -36,7 +36,7 @@ def chkEnv():
         print("There is no label folder in this path:", datasetPath + labelPath)
         quit()
 
-    if not os.path.exists(datasetPath+removedPath):
+    if not os.path.exists(os.path.join(datasetPath,removedPath) ):
         os.makedirs(datasetPath+removedPath)
         os.makedirs(datasetPath+removedPath+"images")
         os.makedirs(datasetPath+removedPath+"labels")
