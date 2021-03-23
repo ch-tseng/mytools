@@ -12,12 +12,16 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-datasetPath = "C:/Users/ch.tseng/iCloudDrive/Model_Sale/Forklift/dataset/voc/"
+datasetPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples"
 imgPath = "images/"
 labelPath = "labels/"
 removedPath = "None/"
 rename_files = True
-newPath = "C:/Users/ch.tseng/iCloudDrive/Model_Sale/Forklift/dataset/voc2/"
+newPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\final"
+
+datasetPath = datasetPath.replace('\\', '/')
+print(datasetPath)
+newPath = newPath.replace('\\', '/')
 
 def chkEnv():
     if not os.path.exists(datasetPath):
@@ -85,8 +89,8 @@ def getLabels(xmlFile):
 chkEnv()
 
 i = 0
-labelFolder = datasetPath + labelPath
-imageFolder = datasetPath + imgPath
+labelFolder = os.path.join(datasetPath, labelPath)
+imageFolder = os.path.join(datasetPath, imgPath)
 
 for file in os.listdir(labelFolder):
     filename, file_extension = os.path.splitext(file)
@@ -133,6 +137,7 @@ for file in os.listdir(imageFolder):
             xml_path = datasetPath + labelPath + filename+".xml"
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(xml_path)
             image = cv2.imread(image_path)
+            image_org = image.copy()
 
             if(labelName is not None):
                 id += 1
@@ -144,7 +149,7 @@ for file in os.listdir(imageFolder):
                     i += 1
 
                 newname = str(id).zfill(8)
-                cv2.imwrite(os.path.join(newPath,"images", newname+'.jpg'), image)
+                cv2.imwrite(os.path.join(newPath,"images", newname+'.jpg'), image_org)
                 shutil.copy2(xml_path, os.path.join(newPath,"labels", newname+'.xml'))
 
             else:

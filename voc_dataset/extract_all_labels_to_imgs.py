@@ -10,15 +10,18 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = "M:/Diabnext/dataset/extract"
-dataset_images = "M:/Diabnext/dataset/images"
-dataset_labels = "M:/Diabnext/dataset/labels20200805/labels"
+extract_to = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\extract"
+dataset_images = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\images"
+dataset_labels = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\labels"
 resize_to = None  #(32, 32)
 
 #folderCharacter = "/"  # \\ is for windows
 xml_file = "../auto_label_voc/xml_file.txt"
 object_xml_file = "../auto_label_voc/xml_object.txt"
 #-------------------------------------------
+extract_to = extract_to.replace('\\', '/')
+dataset_images = dataset_images.replace('\\', '/')
+dataset_labels = dataset_labels.replace('\\', '/')
 
 def chkEnv():
     if not os.path.exists(extract_to):
@@ -113,7 +116,10 @@ for file in os.listdir(dataset_images):
                 cv2.rectangle(image, (labelXmin[id], labelYmin[id]), (labelXmax[id], labelYmax[id]), (0,255,0), 2)
                 label_area = orgImage[labelYmin[id]:labelYmax[id], labelXmin[id]:labelXmax[id]]
                 label_img_filename = filename + "_" + str(id) + ".jpg"
-                write_lale_images(labelName[id], label_area, extract_to, label_img_filename)
+                try:
+                    write_lale_images(labelName[id], label_area, extract_to, label_img_filename)
+                except:
+                    continue
 
             #cv2.imshow("Image", imutils.resize(image, width=700))
             k = cv2.waitKey(1)
