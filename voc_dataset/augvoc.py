@@ -34,15 +34,15 @@ class augment():
                 'blur_mot': [[12,24]],
                 'lighter': [[0.15, 0.5]],
                 'darker': [[0.10, 0.30]],
-                'noise': [[0.3,0.6]],
-                'mosaic': [[5,35]],
+                'noise': [[0.2,0.5]],
+                'mosaic': [[5,25]],
                 'imgs_mosaic': [[2,4]],
                 'small2large': [[0.2, 0.5]],
                 'contrast_more': [[-30, 60]],
                 'contrast_less': [[0.2, 2.5]],
-                'add_line': [[12]], #[max] border
-                'add_square': [[30,120], [30,120]], #[[minW, minH], [maxW, maxH]]
-                'add_circle': [[30,120]] #[[min, max]]
+                'add_line': [[8]], #[max] border
+                'add_square': [[30,90], [30,90]], #[[minW, minH], [maxW, maxH]]
+                'add_circle': [[30,90]] #[[min, max]]
             }
 
         else:
@@ -109,9 +109,9 @@ class augment():
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             width = random.randint(diverse_2["add_square"][0][0], diverse_2["add_square"][0][1] - 1)
             height = random.randint(diverse_2["add_square"][1][0], diverse_2["add_square"][1][1] - 1)
-            border = random.randint(0, min(width,height)-1)
+            border = random.randint(0, 5)
 
-            if(border<5): border = -1
+            if(border<3): border = -1
 
             print("width, height: ", width,height)
             point_left_x = random.randint(0, img.shape[1]-1)
@@ -126,8 +126,8 @@ class augment():
         for i in range(0, count):
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             diameter = random.randint(10, diverse_2["add_circle"][0][0]-1)
-            border = random.randint(1, diameter)
-            if(border<5): border = -1
+            border = random.randint(1, 5)
+            if(border<3): border = -1
 
             point_center_x = random.randint(0, img.shape[1]-diameter-1)
             point_center_y = random.randint(0, img.shape[0]-diameter-1)
@@ -278,16 +278,14 @@ class augment():
 
     def get_new_bbox(self, img, bboxes, labellist, type_diverse):
         diverse_1 = self.diverse_1
-        org_img = img.copy()
+        cimg = img.copy()
         h_img, w_img = img.shape[0], img.shape[1]
         boxes, labels = [], []
         mask_img = None
 
-        if(type_diverse == 'rotate'):
-            angle = 0
-            while angle== 0:
-                angle = random.randint(diverse_1['rotate'][0][0], diverse_1['rotate'][0][1])
-
+        if(type_diverse[:6] == 'rotate'):
+            angle = int(type_diverse[6:9])
+            
         if(type_diverse == 'shift'):
             shift_value = 0
             while shift_value == 0:
@@ -297,8 +295,8 @@ class augment():
 
         if(type_diverse == 'flip'):
             f_type = random.randint(-1,1)
-            img = cv2.flip(img, f_type)
-            mask_img_org = cv2.flip(mask_img, f_type)
+            cimg = cv2.flip(img, f_type)
+            #mask_img_org = cv2.flip(mask_img, f_type)
 
         for id, box in enumerate(bboxes):
             #create mask for the original image
@@ -306,15 +304,21 @@ class augment():
             org_rect = np.zeros((h_img, w_img), dtype = 'uint8')
             mask_img = cv2.rectangle(org_rect, (x, y), (x+w, y+h), 255, -1)
 
-            if(type_diverse == 'rotate'):
-                img, mask_img = self.do_rotate(org_img, mask_img, angle)
+            if(type_diverse[:6] == 'rotate'):
+                cimg, mask_img = self.do_rotate(img, mask_img, angle)
+                #cv2.imshow('test', imutils.resize(cimg, width=600))
+                #cv2.imshow('test2', imutils.resize(mask_img, width=600))
+                #cv2.waitKey(0)
 
             elif(type_diverse == 'shift'):
-                img, mask_img = self.do_shift(org_img, mask_img, s_type, shift_value, shift_range)
-                cv2.imwrite("TEST.jpg", mask_img)
+                cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
+                #cv2.imshow('test', imutils.resize(img, width=600))
+                #cv2.imshow('test2', imutils.resize(mask_img, width=600))
+                #cv2.waitKey(0)
 
             elif(type_diverse == 'flip'):
                 mask_img = cv2.flip(mask_img, f_type)
+
 
             contours, hierarchy = cv2.findContours(mask_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             #for c in contours:
@@ -324,7 +328,7 @@ class augment():
                 labels.append(labellist[id])
             #cv2.rectangle(frame, (left,top), (right,bottom), (255, 0, 0), 2)
 
-        return img, boxes, labels
+        return cimg, boxes, labels
 
     def xmlLabels(self, imgFile, xmlFile):
         labelXML = minidom.parse(xmlFile)
@@ -437,14 +441,14 @@ class augment():
                     labelName, bboxes = self.getLabels(image_path, xml_path)
                     print("Grepped from XML: ", labelName, bboxes )
 
-                    img = cv2.imread(image_path)
+                    img_org = cv2.imread(image_path)
 
                     for count_num in range(0, img_aug_count):
 
                         ways = {0: 'no_change', 1:'shift', 2:'rotate', 3:'flip'}
                         con_id = random.randint(0, len(ways)-1)
                         if(con_id>0):
-                            img, bboxes, labelName = self.get_new_bbox(img, bboxes, labelName, ways[con_id])
+                            img, bboxes, labelName = self.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             print('way:', ways[con_id])
 
                         ways = random.sample([0, 1, 2, 3, 4, 5, 6, 7], type_count)
@@ -471,8 +475,8 @@ class augment():
                         #plt.imshow(img)
                         aug_filename = "{}_{}-{}-{}".format(filename, con_id, ways_txt, count_num)
                         cv2.imwrite(os.path.join(output_aug_images, aug_filename+file_extension), img)
-                        for box in bboxes:
-                            cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), (255, 0, 0), 5)
+                        #for box in bboxes:
+                        #    cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), (255, 0, 0), 5)
 
                         cv2.imwrite("output/{}".format(aug_filename+file_extension), img)
 
