@@ -13,12 +13,12 @@ import shutil
 
 #-------------------------------------------
 
-datasetPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples"
+datasetPath = r"D:\works\crowd_human_add_in_water"
 imgPath = "images/"
 labelPath = "labels/"
 removedPath = "None/"
 rename_files = True
-newPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\final"
+newPath = r"D:\works\crowd_human_add_in_water\final"
 
 datasetPath = datasetPath.replace('\\', '/')
 print(datasetPath)
@@ -140,6 +140,11 @@ for file in os.listdir(imageFolder):
         else:
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(xml_path)
             image = cv2.imread(image_path)
+            try:
+                test = image.shape
+            except:
+                continue
+
             image_org = image.copy()
 
             if(labelName is not None):
