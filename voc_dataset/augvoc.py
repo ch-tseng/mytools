@@ -51,16 +51,19 @@ class augment():
 
 
     def load_negs(self, neg_path):
-        neg_list = glob.glob(neg_path)
+        print('test',neg_path)
+        neg_list = os.listdir(neg_path)
+        print('test2', neg_list)
         self.neg_list = neg_list
 
-    def overlay_neg(self, img):
+    def overlay_neg(self, img, dir):
         neglist = self.neg_list
-        alpha = random.randint(3,8) / 10
+
+        alpha = random.randint(1,5) / 10
         
         w, h = img.shape[1], img.shape[0]
-        neg_file = neglist[randint(0, len(neglist))]
-        neg_img = cv2.imread(neg_file)
+        neg_file = neglist[random.randint(0, len(neglist))]
+        neg_img = cv2.imread( os.path.join(dir, neg_file) )
         neg_img = cv2.resize(neg_img, (w,h))
 
         image_new = cv2.addWeighted(neg_img, alpha, img, 1 - alpha, 0)
@@ -345,7 +348,7 @@ class augment():
 
         if(type_diverse[:6] == 'rotate'):
             angle = int(type_diverse[6:9])
-            cimg, mask_img = self.do_rotate(img, mask_img, angle)
+            #cimg, mask_img = self.do_rotate(img, mask_img, angle)
             
         if(type_diverse == 'shift'):
             shift_value = 0
@@ -354,7 +357,7 @@ class augment():
                 shift_range = int(diverse_1['shift'][0][0] * img.shape[0])
                 shift_value = random.randint(-shift_range, shift_range)
 
-            cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
+            #cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
 
         if(type_diverse == 'flip'):
             f_type = random.randint(-1,1)

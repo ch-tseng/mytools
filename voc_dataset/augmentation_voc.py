@@ -6,13 +6,13 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_images = r'C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2\images'
-dataset_labels = r'C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2\labels'
-neg_images = r'C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human\crowd_humang\dataset\negatives'
+dataset_images = r'D:\temp\total_crowdhuman\images'
+dataset_labels = r'D:\temp\total_crowdhuman\labels'
+neg_images = r'D:\temp\total_crowdhuman\negatives'
 
-output_aug_images = r'C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2\aug_images'
-output_aug_labels = r'C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2\aug_labels'
-output_aug_negs = r'C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2\negatives'
+output_aug_images = r'D:\temp\total_crowdhuman\aug_images'
+output_aug_labels = r'D:\temp\total_crowdhuman\aug_labels'
+output_aug_negs = r'D:\temp\total_crowdhuman\negatives'
 
 img_aug_count = 1
 
@@ -21,6 +21,7 @@ dataset_labels = dataset_labels.replace('\\', '/')
 output_aug_images = output_aug_images.replace('\\', '/')
 output_aug_labels = output_aug_labels.replace('\\', '/')
 output_aug_negs = output_aug_negs.replace('\\', '/')
+neg_images = neg_images.replace('\\', '/')
 
 if not os.path.exists(output_aug_images):
     os.makedirs(output_aug_images)
@@ -109,9 +110,9 @@ if __name__ == "__main__":
                             aug_filename = "{}_{}-{}-{}".format(filename, con_id, ways_txt, count_num)
                             cv2.imwrite(os.path.join(output_aug_negs, aug_filename+file_extension), img)
 
-
-    print("Generate training images from ", dataset_images)
-    augmentation.load_negs(neg_images)
+    
+    print("Generate training images from ", output_aug_negs)
+    augmentation.load_negs(output_aug_negs)
     #Manual
     for id, file in tqdm(enumerate(os.listdir(dataset_images))):
         #if(id>0):
@@ -130,7 +131,8 @@ if __name__ == "__main__":
 
                 for count_num in range(0, img_aug_count):
                     
-                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
+                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
+                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
                     for con_id in ways:
                         img_org = cv2.imread(image_path)
                         try:
@@ -144,7 +146,8 @@ if __name__ == "__main__":
                         cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                         #print('way:', ways[con_id]) 
                         
-                        for way_id in [ 0, 1, 2, 3, 4, 5, 6, 8]:
+                        #for way_id in [ 0, 1, 2, 3, 4, 5, 6, 8]:
+                        for way_id in [ 0, 4, 5, 6 ]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(5,25))
@@ -161,7 +164,7 @@ if __name__ == "__main__":
                             elif(way_id == 7):
                                 img = augmentation.do_mosaic(img)
                             elif(way_id == 8):
-                                img = augmentation.overlay_neg(img)
+                                img = augmentation.overlay_neg(img, output_aug_negs)
 
                             ways_txt = str(way_id)
 
