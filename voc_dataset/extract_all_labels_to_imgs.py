@@ -10,9 +10,9 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\extract"
-dataset_images = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\images"
-dataset_labels = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_humang\dataset\add_20210322_lie_down_peoples\labels"
+extract_to = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final\extract"
+dataset_images = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final\images"
+dataset_labels = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final\labels"
 resize_to = None  #(32, 32)
 
 #folderCharacter = "/"  # \\ is for windows
@@ -111,6 +111,12 @@ for file in os.listdir(dataset_images):
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
             orgImage = cv2.imread(image_path)
+            try:
+                test = orgImage.shape
+
+            except:
+                continue
+                
             image = orgImage.copy()
             for id, label in enumerate(labelName):
                 cv2.rectangle(image, (labelXmin[id], labelYmin[id]), (labelXmax[id], labelYmax[id]), (0,255,0), 2)

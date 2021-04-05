@@ -13,12 +13,12 @@ import shutil
 
 #-------------------------------------------
 
-datasetPath = r"D:\works\crowd_human_add_in_water"
+datasetPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final"
 imgPath = "images/"
 labelPath = "labels/"
 removedPath = "None/"
 rename_files = True
-newPath = r"D:\works\crowd_human_add_in_water\final"
+newPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2"
 
 datasetPath = datasetPath.replace('\\', '/')
 print(datasetPath)
