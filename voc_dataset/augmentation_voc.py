@@ -165,6 +165,8 @@ if __name__ == "__main__":
                                 img = augmentation.do_mosaic(img)
                             elif(way_id == 8):
                                 img = augmentation.overlay_neg(img, output_aug_negs)
+                            elif(way_id == 9):
+                                img = do_small_larger(img, s_ratio=0.3)
 
                             ways_txt = str(way_id)
 
@@ -174,7 +176,7 @@ if __name__ == "__main__":
                             #for box in bboxes:
                             #    cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), (255, 0, 0), 5)
 
-                            cv2.imwrite("output/{}".format(aug_filename+file_extension), img)
+                            #cv2.imwrite("output/{}".format(aug_filename+file_extension), img)
                             #cv2.imwrite("output2.jpg", mask)
 
                             #print("TEST:", output_aug_images, file)

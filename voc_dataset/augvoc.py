@@ -265,7 +265,7 @@ class augment():
         image = image*255
         image = image.astype(np.uint8)
 
-        return image
+        return image   
 
     def do_mosaic(self, frame):
         diverse_2 = self.diverse_2
@@ -274,13 +274,28 @@ class augment():
         neighbor = random.randrange(diverse_2["mosaic"][0][0], diverse_2["mosaic"][0][1], 2)
         for i in range(0, h - neighbor, neighbor):  # 关键点0 减去neightbour 防止溢出
             for j in range(0, w - neighbor, neighbor):
+                overlay = frame.copy()
                 rect = [j + x, i + y, neighbor, neighbor]
                 color = frame[i + y][j + x].tolist()  # 关键点1 tolist
                 left_up = (rect[0], rect[1])
                 right_down = (rect[0] + neighbor - 1, rect[1] + neighbor - 1)  # 关键点2 减去一个像素
-                cv2.rectangle(frame, left_up, right_down, color, -1)
+
+                alpha = random.randint(1,3) / 10
+           
+                cv2.rectangle(overlay, (point_left_x, point_left_y), (point_left_x+width, point_left_y+height), color, border)
+                
+
+                cv2.rectangle(overlay, left_up, right_down, color, -1)
+                frame = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
 
         return frame
+
+    def do_small_larger(self, frame, s_ratio=0.4):
+        (h, w)= frame.shape
+        smaller = cv2.resize(frame, (int(w*s_ratio), int(h*s_ratio)))
+        larger = cv2.resize(smaller, (w, h))
+
+        return larger
 
     def do_rotate(self, img, mask, angle):
         diverse_1 = self.diverse_1
