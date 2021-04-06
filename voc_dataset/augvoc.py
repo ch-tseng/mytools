@@ -281,12 +281,8 @@ class augment():
                 right_down = (rect[0] + neighbor - 1, rect[1] + neighbor - 1)  # 关键点2 减去一个像素
 
                 alpha = random.randint(1,3) / 10
-           
-                cv2.rectangle(overlay, (point_left_x, point_left_y), (point_left_x+width, point_left_y+height), color, border)
-                
-
                 cv2.rectangle(overlay, left_up, right_down, color, -1)
-                frame = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+                frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
 
         return frame
 
