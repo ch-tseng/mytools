@@ -287,7 +287,7 @@ class augment():
         return frame
 
     def do_small_larger(self, frame, s_ratio=0.4):
-        (h, w)= frame.shape
+        h, w = frame.shape[0], frame.shape[1]
         smaller = cv2.resize(frame, (int(w*s_ratio), int(h*s_ratio)))
         larger = cv2.resize(smaller, (w, h))
 
