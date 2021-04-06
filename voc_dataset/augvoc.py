@@ -5,11 +5,12 @@ import imutils
 import os, sys
 import random
 import numpy as np
+import glob
 
 class augment():
     def __init__(self, dataset_images, dataset_labels, output_img_path, output_xml_path, diverse_1=None, diverse_2=None):
-        self.xml_file1 = "../auto_label_voc/xml_file.txt"
-        self.xml_file2 = "../auto_label_voc/xml_object.txt"
+        self.xml_file1 = "xml_file.txt"
+        self.xml_file2 = "xml_object.txt"
         self.dataset_images = dataset_images
         self.dataset_labels = dataset_labels
         self.output_aug_images = output_img_path
@@ -34,19 +35,53 @@ class augment():
                 'blur_mot': [[12,24]],
                 'lighter': [[0.15, 0.5]],
                 'darker': [[0.10, 0.30]],
-                'noise': [[0.3,0.6]],
-                'mosaic': [[5,35]],
+                'noise': [[0.2,0.5]],
+                'mosaic': [[5,25]],
                 'imgs_mosaic': [[2,4]],
                 'small2large': [[0.2, 0.5]],
                 'contrast_more': [[-30, 60]],
                 'contrast_less': [[0.2, 2.5]],
-                'add_line': [[12]], #[max] border
-                'add_square': [[30,120], [30,120]], #[[minW, minH], [maxW, maxH]]
-                'add_circle': [[30,120]] #[[min, max]]
+                'add_line': [[8]], #[max] border
+                'add_square': [[30,90], [30,90]], #[[minW, minH], [maxW, maxH]]
+                'add_circle': [[30,90]] #[[min, max]]
             }
 
         else:
             self.diverse_2 = diverse_2
+
+    def load_dataset(self, ds_path):
+        ds_list = os.listdir(ds_path)
+        self.ds_list = ds_list
+
+    def load_negs(self, neg_path):
+        neg_list = os.listdir(neg_path)
+        self.neg_list = neg_list
+
+    def overlay_neg(self, img, dir):
+        neglist = self.neg_list
+
+        alpha = random.randint(1,5) / 10
+        
+        w, h = img.shape[1], img.shape[0]
+        neg_file = neglist[random.randint(0, len(neglist))]
+        neg_img = cv2.imread( os.path.join(dir, neg_file) )
+        neg_img = cv2.resize(neg_img, (w,h))
+
+        image_new = cv2.addWeighted(neg_img, alpha, img, 1 - alpha, 0)
+
+        return image_new
+
+    def merge_img(self, frame1, frame2):
+        h, w = frame1.shape[0], frame1.shape[1]
+        hh, ww = frame2.shape[0], frame2.shape[1]
+        h_ratio = h/hh
+        w_ratio = w/ww
+
+        alpha = 0.5
+        frame2 = cv2.resize(frame2, (w,h))
+        image_new = cv2.addWeighted(frame1, alpha, frame2, 1 - alpha, 0)
+
+        return image_new, (w_ratio, h_ratio)
 
     def do_shift(self, img, mask, s_type, shift_value, shift_range):
         diverse_1 = self.diverse_1
@@ -82,6 +117,8 @@ class augment():
 
     def draw_lines(self, img, count):
         diverse_2 = self.diverse_2
+        overlay = img.copy()
+
         for i in range(0, count):
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             border = random.randint(1, diverse_2["add_line"][0][0])
@@ -99,35 +136,66 @@ class augment():
                 point_right_x = random.randint(0, img.shape[1]-1)
                 point_right_y = random.randint(int(4*img.shape[0]/5), img.shape[0]-1)
 
-            img = cv2.line(img, (point_left_x, point_left_y), (point_right_x, point_right_y), color, border)
+            alpha = random.randint(3,8) / 10
+            
+            cv2.line(overlay, (point_left_x, point_left_y), (point_right_x, point_right_y), color, border)
+            image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
 
-        return img
+        return image_new
 
     def draw_square(self, img, count):
         diverse_2 = self.diverse_2
+        overlay = img.copy()
         for i in range(0, count):
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             width = random.randint(diverse_2["add_square"][0][0], diverse_2["add_square"][0][1] - 1)
             height = random.randint(diverse_2["add_square"][1][0], diverse_2["add_square"][1][1] - 1)
-            border = random.randint(0, min(width,height)-1)
+            border = random.randint(0, 5)
 
-            if(border<5): border = -1
+            if(border<3): border = -1
 
-            print("width, height: ", width,height)
             point_left_x = random.randint(0, img.shape[1]-1)
             point_left_y = random.randint(0, img.shape[0]-1)
 
-            img = cv2.rectangle(img, (point_left_x, point_left_y), (point_left_x+width, point_left_y+height), color, border)
+            alpha = random.randint(3,8) / 10
+           
+            cv2.rectangle(overlay, (point_left_x, point_left_y), (point_left_x+width, point_left_y+height), color, border)
+            image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
 
-        return img
+        return image_new
+
+    def rgb2gray2rgb(self, img):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray_3channel = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+
+        return gray_3channel
 
     def draw_circle(self, img, count):
+        diverse_2 = self.diverse_2
+        overlay = img.copy()
+        for i in range(0, count):
+            color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
+            diameter = random.randint(10, diverse_2["add_circle"][0][0]-1)
+            border = random.randint(1, 5)
+            if(border<3): border = -1
+
+            point_center_x = random.randint(0, img.shape[1]-diameter-1)
+            point_center_y = random.randint(0, img.shape[0]-diameter-1)
+
+            alpha = random.randint(3,8) / 10
+            
+            cv2.circle(overlay,(point_center_x, point_center_y), diameter, color, border)
+            image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+
+        return image_new
+
+    def draw_circle_old(self, img, count):
         diverse_2 = self.diverse_2
         for i in range(0, count):
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             diameter = random.randint(10, diverse_2["add_circle"][0][0]-1)
-            border = random.randint(1, diameter)
-            if(border<5): border = -1
+            border = random.randint(1, 5)
+            if(border<3): border = -1
 
             point_center_x = random.randint(0, img.shape[1]-diameter-1)
             point_center_y = random.randint(0, img.shape[0]-diameter-1)
@@ -214,7 +282,7 @@ class augment():
         image = image*255
         image = image.astype(np.uint8)
 
-        return image
+        return image   
 
     def do_mosaic(self, frame):
         diverse_2 = self.diverse_2
@@ -223,13 +291,23 @@ class augment():
         neighbor = random.randrange(diverse_2["mosaic"][0][0], diverse_2["mosaic"][0][1], 2)
         for i in range(0, h - neighbor, neighbor):  # 关键点0 减去neightbour 防止溢出
             for j in range(0, w - neighbor, neighbor):
+                overlay = frame.copy()
                 rect = [j + x, i + y, neighbor, neighbor]
                 color = frame[i + y][j + x].tolist()  # 关键点1 tolist
                 left_up = (rect[0], rect[1])
                 right_down = (rect[0] + neighbor - 1, rect[1] + neighbor - 1)  # 关键点2 减去一个像素
-                cv2.rectangle(frame, left_up, right_down, color, -1)
 
+                alpha = random.randint(2,6) / 10
+                cv2.rectangle(overlay, left_up, right_down, color, -1)
+                frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
         return frame
+
+    def do_small_larger(self, frame, s_ratio=0.4):
+        h, w = frame.shape[0], frame.shape[1]
+        smaller = cv2.resize(frame, (int(w*s_ratio), int(h*s_ratio)))
+        larger = cv2.resize(smaller, (w, h))
+
+        return larger
 
     def do_rotate(self, img, mask, angle):
         diverse_1 = self.diverse_1
@@ -276,18 +354,29 @@ class augment():
 
         return labelName, bboxes
 
+    def do_imgchange(self, img, type_diverse):
+
+        if(type_diverse[:6] == 'rotate'):
+            angle = int(type_diverse[6:9])
+            img = imutils.rotate_bound(img, angle)
+
+        if(type_diverse == 'flip'):
+            f_type = random.randint(-1,1)
+            img = cv2.flip(img, f_type)
+
+        return img
+
     def get_new_bbox(self, img, bboxes, labellist, type_diverse):
-        diverse_1 = self.diverse_1
-        org_img = img.copy()
+        diverse_1 = self.diverse_1               
+        cimg = img.copy()
         h_img, w_img = img.shape[0], img.shape[1]
         boxes, labels = [], []
         mask_img = None
 
-        if(type_diverse == 'rotate'):
-            angle = 0
-            while angle== 0:
-                angle = random.randint(diverse_1['rotate'][0][0], diverse_1['rotate'][0][1])
-
+        if(type_diverse[:6] == 'rotate'):
+            angle = int(type_diverse[6:9])
+            #cimg, mask_img = self.do_rotate(img, mask_img, angle)
+            
         if(type_diverse == 'shift'):
             shift_value = 0
             while shift_value == 0:
@@ -295,10 +384,12 @@ class augment():
                 shift_range = int(diverse_1['shift'][0][0] * img.shape[0])
                 shift_value = random.randint(-shift_range, shift_range)
 
+            #cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
+
         if(type_diverse == 'flip'):
             f_type = random.randint(-1,1)
-            img = cv2.flip(img, f_type)
-            mask_img_org = cv2.flip(mask_img, f_type)
+            cimg = cv2.flip(img, f_type)
+            #mask_img_org = cv2.flip(mask_img, f_type)
 
         for id, box in enumerate(bboxes):
             #create mask for the original image
@@ -306,15 +397,21 @@ class augment():
             org_rect = np.zeros((h_img, w_img), dtype = 'uint8')
             mask_img = cv2.rectangle(org_rect, (x, y), (x+w, y+h), 255, -1)
 
-            if(type_diverse == 'rotate'):
-                img, mask_img = self.do_rotate(org_img, mask_img, angle)
+            if(type_diverse[:6] == 'rotate'):
+                cimg, mask_img = self.do_rotate(img, mask_img, angle)
+                #cv2.imshow('test', imutils.resize(cimg, width=600))
+                #cv2.imshow('test2', imutils.resize(mask_img, width=600))
+                #cv2.waitKey(0)
 
             elif(type_diverse == 'shift'):
-                img, mask_img = self.do_shift(org_img, mask_img, s_type, shift_value, shift_range)
-                cv2.imwrite("TEST.jpg", mask_img)
+                cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
+                #cv2.imshow('test', imutils.resize(img, width=600))
+                #cv2.imshow('test2', imutils.resize(mask_img, width=600))
+                #cv2.waitKey(0)
 
             elif(type_diverse == 'flip'):
                 mask_img = cv2.flip(mask_img, f_type)
+
 
             contours, hierarchy = cv2.findContours(mask_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             #for c in contours:
@@ -324,7 +421,7 @@ class augment():
                 labels.append(labellist[id])
             #cv2.rectangle(frame, (left,top), (right,bottom), (255, 0, 0), 2)
 
-        return img, boxes, labels
+        return cimg, boxes, labels
 
     def xmlLabels(self, imgFile, xmlFile):
         labelXML = minidom.parse(xmlFile)
@@ -380,7 +477,7 @@ class augment():
         for id in range(0, len(labelName)):
             xmlObject = xmlObject + self.writeObjects(labelName[id], (labelXmin[id], labelYmin[id], labelXmax[id], labelYmax[id]))
             #print(xmlObject)
-            print("----------------------------------------------------------------------")
+            #print("----------------------------------------------------------------------")
 
         with open(self.xml_file1) as file:
             xmlfile = file.read()
@@ -426,37 +523,34 @@ class augment():
             file_extension = file_extension.lower()
 
             if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-                print("Processing: ", os.path.join(dataset_images, file))
+                #print("Processing: ", os.path.join(dataset_images, file))
 
-                if not os.path.exists(os.path.join(dataset_labels, filename+".xml")):
-                    print("Cannot find the file {} for the image.".format(os.path.join(dataset_labels, filename+".xml")))
-
-                else:
+                if os.path.exists(os.path.join(dataset_labels, filename+".xml")):
                     image_path = os.path.join(dataset_images, file)
                     xml_path = os.path.join(dataset_labels, filename+".xml")
                     labelName, bboxes = self.getLabels(image_path, xml_path)
-                    print("Grepped from XML: ", labelName, bboxes )
+                    #print("Grepped from XML: ", labelName, bboxes )
 
-                    img = cv2.imread(image_path)
+                    img_org = cv2.imread(image_path)
 
                     for count_num in range(0, img_aug_count):
 
                         ways = {0: 'no_change', 1:'shift', 2:'rotate', 3:'flip'}
                         con_id = random.randint(0, len(ways)-1)
                         if(con_id>0):
-                            img, bboxes, labelName = self.get_new_bbox(img, bboxes, labelName, ways[con_id])
-                            print('way:', ways[con_id])
+                            img, bboxes, labelName = self.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
+                            #print('way:', ways[con_id])
 
                         ways = random.sample([0, 1, 2, 3, 4, 5, 6, 7], type_count)
                         ways_txt = ''
 
                         for way_id in ways:
                             if(way_id == 1):
-                                img = self.draw_lines(img,random.randint(5,25))
+                                img = self.draw_lines(img,random.randint(10,50))
                             elif(way_id == 2):
-                                img = self.draw_square(img, random.randint(5,25))
+                                img = self.draw_square(img, random.randint(10,50))
                             elif(way_id == 3):
-                                img = self.draw_circle(img, random.randint(5,25))
+                                img = self.draw_circle(img, random.randint(10,50))
                             elif(way_id == 4):
                                 img = self.contrast_more(img)
                             elif(way_id == 5):
@@ -471,8 +565,8 @@ class augment():
                         #plt.imshow(img)
                         aug_filename = "{}_{}-{}-{}".format(filename, con_id, ways_txt, count_num)
                         cv2.imwrite(os.path.join(output_aug_images, aug_filename+file_extension), img)
-                        for box in bboxes:
-                            cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), (255, 0, 0), 5)
+                        #for box in bboxes:
+                        #    cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), (255, 0, 0), 5)
 
                         cv2.imwrite("output/{}".format(aug_filename+file_extension), img)
 
@@ -491,7 +585,7 @@ class augment():
                         file_object = open(os.path.join(output_aug_labels, xmlFilename), "w")
                         file_object.write(xml_file)
                         file_object.close
-                        print("write to -->", os.path.join(output_aug_labels, xmlFilename))
+                        #print("write to -->", os.path.join(output_aug_labels, xmlFilename))
 
 
 #------------------------------------------------------------------------------
