@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import cv2
+import shutil
 from imutils.face_utils import rect_to_bb
 #import dlib
 import imutils
@@ -8,33 +9,44 @@ import os, time
 import os.path
 import numpy as np
 from xml.dom import minidom
+import shutil
 
 #-------------------------------------------
 
-datasetPath = "/media/sf_datasets/categories/breads_POS/"
+datasetPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final"
 imgPath = "images/"
 labelPath = "labels/"
-removedPath = "negatives/"
+removedPath = "None/"
+rename_files = True
+newPath = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final2"
+
+datasetPath = datasetPath.replace('\\', '/')
+print(datasetPath)
+newPath = newPath.replace('\\', '/')
 
 def chkEnv():
     if not os.path.exists(datasetPath):
         print("There is no dataset folder in this path:", datasetPath)
         quit()
 
-    if not os.path.exists(datasetPath+imgPath):
+    if not os.path.exists(os.path.join(datasetPath, imgPath)):
         print("There is no image folder in this path:", datasetPath + imgPath)
         quit()
 
-    if not os.path.exists(datasetPath+labelPath):
+    if not os.path.exists(os.path.join(datasetPath, labelPath) ):
         print("There is no label folder in this path:", datasetPath + labelPath)
         quit()
 
-    if not os.path.exists(datasetPath+removedPath):
-        os.makedirs(datasetPath+removedPath)
-        os.makedirs(datasetPath+removedPath+"images")
-        os.makedirs(datasetPath+removedPath+"labels")
-        print("Create the path:", datasetPath + removedPath)
+    if not os.path.exists(os.path.join(datasetPath,removedPath) ):
+        os.makedirs(os.path.join(datasetPath,removedPath))
+        os.makedirs(os.path.join(datasetPath,removedPath, "images"))
+        os.makedirs(os.path.join(datasetPath,removedPath, "labels"))
+        print("Create the path:", os.path.join(datasetPath,removedPath))
 
+    if (rename_files is True):
+        if not os.path.exists(newPath):
+            os.makedirs(os.path.join(newPath,"images"))
+            os.makedirs(os.path.join(newPath,"labels"))
 
 def getLabels(xmlFile):
     labelXML = minidom.parse(xmlFile)
@@ -78,15 +90,15 @@ def getLabels(xmlFile):
 chkEnv()
 
 i = 0
-labelFolder = datasetPath + labelPath
-imageFolder = datasetPath + imgPath
+labelFolder = os.path.join(datasetPath, labelPath)
+imageFolder = os.path.join(datasetPath, imgPath)
 
 for file in os.listdir(labelFolder):
     filename, file_extension = os.path.splitext(file)
     file_extension = file_extension.lower()
 
     if(file_extension == ".xml"):
-        label_path = labelFolder + file
+        label_path = os.path.join(labelFolder, file)
         print("Processing: ", label_path)
 
         if os.path.exists(datasetPath+imgPath+filename+".jpg") or \
@@ -102,31 +114,41 @@ for file in os.listdir(labelFolder):
 
             if(labelName is None):
                 print("Empty labels, remove the xml file:", label_path)
-                os.rename(label_path, datasetPath+removedPath+"labels/"+file)
+                #os.rename(label_path, datasetPath+removedPath+"labels/"+file)
+                #shutil.copyfile(label_path, )
 
         else:
             print("Cannot find the image, remove the xml:{}".format(label_path))
-            os.rename(label_path, datasetPath+removedPath+"labels/"+file)
+            #os.rename(label_path, os.path.join(datasetPath,removedPath,"labels", file) )
 
 
+id = 0
 for file in os.listdir(imageFolder):
     filename, file_extension = os.path.splitext(file)
     file_extension = file_extension.lower()
 
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-        print("Processing: ", imageFolder + file)
-        image_path = imageFolder + file
+        image_path = os.path.join(imageFolder, file)
 
-        if not os.path.exists(datasetPath+labelPath+filename+".xml"):
-            print("Cannot find the file {}, remove this.".format(datasetPath+labelPath+filename+".xml"))
-            os.rename(image_path, datasetPath+removedPath+file)
+        print("Processing: ", image_path)
+        
+        xml_path = os.path.join(labelFolder, filename+".xml")
+        if not os.path.exists(xml_path):
+            print("Cannot find the file {}, remove this.".format(xml_path))
+            os.rename(image_path, os.path.join(datasetPath, removedPath, "images", file))
 
         else:
-            xml_path = datasetPath + labelPath + filename+".xml"
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(xml_path)
             image = cv2.imread(image_path)
+            try:
+                test = image.shape
+            except:
+                continue
+
+            image_org = image.copy()
 
             if(labelName is not None):
+                id += 1
                 i = 0
                 for label in labelName:
                     cv2.imshow("Image", imutils.resize(image, width=700))
@@ -134,7 +156,12 @@ for file in os.listdir(imageFolder):
                     k = cv2.waitKey(1)
                     i += 1
 
+                newname = str(id).zfill(8)
+                cv2.imwrite(os.path.join(newPath,"images", newname+'.jpg'), image_org)
+                shutil.copy2(xml_path, os.path.join(newPath,"labels", newname+'.xml'))
+
             else:
-                print("Moved the image with no labels to ", datasetPath+removed)
-                os.rename(image_path, datasetPath+removedPath+"images/"+file)
+                print("Moved the image with no labels to ",  os.path.join(datasetPath, removedPath))
+                shutil.copy2(image_path, os.path.join(datasetPath, removedPath, "images", file) )
+                
 

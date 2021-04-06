@@ -49,12 +49,20 @@ class augment():
         else:
             self.diverse_2 = diverse_2
 
+<<<<<<< HEAD
     def load_dataset(self, ds_path):
         ds_list = os.listdir(ds_path)
         self.ds_list = ds_list
 
     def load_negs(self, neg_path):
         neg_list = os.listdir(neg_path)
+=======
+
+    def load_negs(self, neg_path):
+        print('test',neg_path)
+        neg_list = os.listdir(neg_path)
+        print('test2', neg_list)
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
         self.neg_list = neg_list
 
     def overlay_neg(self, img, dir):
@@ -71,6 +79,7 @@ class augment():
 
         return image_new
 
+<<<<<<< HEAD
     def merge_img(self, frame1, frame2):
         h, w = frame1.shape[0], frame1.shape[1]
         hh, ww = frame2.shape[0], frame2.shape[1]
@@ -82,6 +91,8 @@ class augment():
         image_new = cv2.addWeighted(frame1, alpha, frame2, 1 - alpha, 0)
 
         return image_new, (w_ratio, h_ratio)
+=======
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
     def do_shift(self, img, mask, s_type, shift_value, shift_range):
         diverse_1 = self.diverse_1
@@ -154,6 +165,10 @@ class augment():
 
             if(border<3): border = -1
 
+<<<<<<< HEAD
+=======
+            #print("width, height: ", width,height)
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
             point_left_x = random.randint(0, img.shape[1]-1)
             point_left_y = random.randint(0, img.shape[0]-1)
 
@@ -163,16 +178,20 @@ class augment():
             image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
 
         return image_new
+<<<<<<< HEAD
 
     def rgb2gray2rgb(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         gray_3channel = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
         return gray_3channel
+=======
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
     def draw_circle(self, img, count):
         diverse_2 = self.diverse_2
         overlay = img.copy()
+<<<<<<< HEAD
         for i in range(0, count):
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             diameter = random.randint(10, diverse_2["add_circle"][0][0]-1)
@@ -191,11 +210,34 @@ class augment():
 
     def draw_circle_old(self, img, count):
         diverse_2 = self.diverse_2
+=======
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
         for i in range(0, count):
             color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
             diameter = random.randint(10, diverse_2["add_circle"][0][0]-1)
             border = random.randint(1, 5)
             if(border<3): border = -1
+<<<<<<< HEAD
+=======
+
+            point_center_x = random.randint(0, img.shape[1]-diameter-1)
+            point_center_y = random.randint(0, img.shape[0]-diameter-1)
+
+            alpha = random.randint(3,8) / 10
+            
+            cv2.circle(overlay,(point_center_x, point_center_y), diameter, color, border)
+            image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+
+        return image_new
+
+    def draw_circle_old(self, img, count):
+        diverse_2 = self.diverse_2
+        for i in range(0, count):
+            color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
+            diameter = random.randint(10, diverse_2["add_circle"][0][0]-1)
+            border = random.randint(1, 5)
+            if(border<3): border = -1
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
             point_center_x = random.randint(0, img.shape[1]-diameter-1)
             point_center_y = random.randint(0, img.shape[0]-diameter-1)
@@ -296,6 +338,13 @@ class augment():
                 color = frame[i + y][j + x].tolist()  # 关键点1 tolist
                 left_up = (rect[0], rect[1])
                 right_down = (rect[0] + neighbor - 1, rect[1] + neighbor - 1)  # 关键点2 减去一个像素
+<<<<<<< HEAD
+=======
+
+                alpha = random.randint(1,3) / 10
+                cv2.rectangle(overlay, left_up, right_down, color, -1)
+                frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+>>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
                 alpha = random.randint(2,6) / 10
                 cv2.rectangle(overlay, left_up, right_down, color, -1)
