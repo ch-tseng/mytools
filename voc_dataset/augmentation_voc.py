@@ -6,7 +6,6 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-<<<<<<< HEAD
 dataset_images = r'/WORK1/Reports/train_yolo_with_few_images/dataset/sources/images'
 dataset_labels = r'/WORK1/Reports/train_yolo_with_few_images/dataset/sources/labels'
 neg_images = r'/WORK1/Reports/train_yolo_with_few_images/dataset/negatives'
@@ -14,16 +13,8 @@ neg_images = r'/WORK1/Reports/train_yolo_with_few_images/dataset/negatives'
 output_aug_images = r'/WORK1/Reports/train_yolo_with_few_images/train_full_aug/images'
 output_aug_labels = r'/WORK1/Reports/train_yolo_with_few_images/train_full_aug/labels'
 output_aug_negs = r'/WORK1/Reports/train_yolo_with_few_images/train_full_aug/negatives'
-=======
-dataset_images = r'D:\temp\total_crowdhuman\images'
-dataset_labels = r'D:\temp\total_crowdhuman\labels'
-neg_images = r'D:\temp\total_crowdhuman\negatives'
 
-output_aug_images = r'D:\temp\total_crowdhuman\aug_images'
-output_aug_labels = r'D:\temp\total_crowdhuman\aug_labels'
-output_aug_negs = r'D:\temp\total_crowdhuman\negatives'
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
-
+gen_aug_negatives = False
 img_aug_count = 1
 
 dataset_images = dataset_images.replace('\\', '/')
@@ -78,36 +69,22 @@ def pick_ds_file(ds_files):
     return mimg_id, mfilename, mfile_extension
 
 if __name__ == "__main__":
-    augmentation = augment(dataset_images, dataset_labels, output_aug_images, output_aug_labels)
-<<<<<<< HEAD
-    '''
-    #augmentation.auto_make(img_aug_count, type_count)
-    print("Generate negatives images from ", neg_images)
-    #negatives
-    for id, file in enumerate(tqdm(os.listdir(neg_images))):
-=======
-    
-    #augmentation.auto_make(img_aug_count, type_count)
-    print("Generate negatives images from ", neg_images)
-    #negatives
-    for id, file in tqdm(enumerate(os.listdir(neg_images))):
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
-        filename, file_extension = os.path.splitext(file)
-        file_extension = file_extension.lower()
+    augmentation = augment(dataset_images, dataset_labels, neg_images, output_aug_images, output_aug_labels)
 
-        if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-            image_path = os.path.join(neg_images, file)
-            #print("Processing: ", image_path)
+    if gen_aug_negatives == True:
+        #augmentation.auto_make(img_aug_count, type_count)
+        print("Generate negatives images from ", neg_images)
+        #negatives
+        for id, file in enumerate(tqdm(os.listdir(neg_images))):
+            filename, file_extension = os.path.splitext(file)
+            file_extension = file_extension.lower()
 
-            for count_num in range(0, img_aug_count):
-                    
-<<<<<<< HEAD
+            if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
+                image_path = os.path.join(neg_images, file)
+
+                for count_num in range(0, img_aug_count):
                     ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
                     #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
-=======
-                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
                     for con_id in ways:
                         cimg = cv2.imread(image_path)
                         try:
@@ -117,11 +94,7 @@ if __name__ == "__main__":
 
                         cimg = augmentation.do_imgchange(cimg, ways[con_id])
                         #for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
-<<<<<<< HEAD
-                        for way_id in [ 0, 1, 2, 3, 4, 5, 6, 7, 9]:
-=======
-                        for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
+                        for way_id in [ 0, 1, 2, 3, 4, 5, 6, 7, 9, 11]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(20,50))
@@ -137,12 +110,11 @@ if __name__ == "__main__":
                                 img = augmentation.noisy(img)
                             elif(way_id == 7):
                                 img = augmentation.do_mosaic(img)
-<<<<<<< HEAD
                             elif(way_id == 9):
                                 img = augmentation.do_small_larger(img, s_ratio=0.3)
+                            elif(way_id == 11):
+                                img = augmentation.rgb2gray2rgb(img)
 
-=======
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
                             ways_txt = str(way_id)
 
@@ -150,21 +122,12 @@ if __name__ == "__main__":
                             aug_filename = "{}_{}-{}-{}".format(filename, con_id, ways_txt, count_num)
                             cv2.imwrite(os.path.join(output_aug_negs, aug_filename+file_extension), img)
 
-<<<<<<< HEAD
-    '''
     print("Generate training images from ", output_aug_negs)
 
     augmentation.load_dataset(dataset_images)
     augmentation.load_negs(output_aug_negs)
     #Manual
     for id, file in enumerate(tqdm(augmentation.ds_list)):
-=======
-    
-    print("Generate training images from ", output_aug_negs)
-    augmentation.load_negs(output_aug_negs)
-    #Manual
-    for id, file in tqdm(enumerate(os.listdir(dataset_images))):
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
         #if(id>0):
         #    break
 
@@ -177,20 +140,11 @@ if __name__ == "__main__":
             if os.path.exists(os.path.join(dataset_labels, filename+".xml")):
                 image_path = os.path.join(dataset_images, file)
                 xml_path = os.path.join(dataset_labels, filename+".xml")
-<<<<<<< HEAD
 
                 for count_num in tqdm(range(0, img_aug_count)):
                     
                     ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
                     #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
-=======
-                
-
-                for count_num in range(0, img_aug_count):
-                    
-                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
                     for con_id in ways:
                         img_org = cv2.imread(image_path)
                         try:
@@ -199,21 +153,12 @@ if __name__ == "__main__":
                             break
 
                         labelName, bboxes = augmentation.getLabels(image_path, xml_path)
-<<<<<<< HEAD
-=======
-                        #print("Grepped from XML: ", labelName, bboxes )
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
                         cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                         #print('way:', ways[con_id]) 
-                        
-<<<<<<< HEAD
-                        for way_id in tqdm([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
-                        #for way_id in [ 10 ]:
-=======
-                        #for way_id in [ 0, 1, 2, 3, 4, 5, 6, 8]:
-                        for way_id in [ 0, 4, 5, 6 ]:
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
+
+                        #for way_id in tqdm([ 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
+                        for way_id in [ 0,1,2,3 ]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(5,25))
@@ -232,7 +177,6 @@ if __name__ == "__main__":
                             elif(way_id == 8):
                                 img = augmentation.overlay_neg(img, output_aug_negs)
                             elif(way_id == 9):
-<<<<<<< HEAD
                                 img = augmentation.do_small_larger(img, s_ratio=0.3)
                             elif(way_id == 10):
                                 mid, mfile_name, mfile_ext = pick_ds_file(augmentation.ds_list)
@@ -247,27 +191,12 @@ if __name__ == "__main__":
 
                             elif(way_id == 11):
                                 img = augmentation.rgb2gray2rgb(img)
-=======
-                                img = do_small_larger(img, s_ratio=0.3)
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
                             ways_txt = str(way_id)
 
                             #plt.imshow(img) 
                             aug_filename = "{}_{}-{}-{}".format(filename, con_id, ways_txt, count_num)
                             cv2.imwrite(os.path.join(output_aug_images, aug_filename+file_extension), img)
-<<<<<<< HEAD
-=======
-                            #for box in bboxes:
-                            #    cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), (255, 0, 0), 5)
-
-                            #cv2.imwrite("output/{}".format(aug_filename+file_extension), img)
-                            #cv2.imwrite("output2.jpg", mask)
-
-                            #print("TEST:", output_aug_images, file)
-                            #image_path = os.path.join(output_aug_images, file)
-                            #xml_path = os.path.join(output_aug_labels, filename+".xml")
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
 
                             aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax = [], [], [], [], []
                             for id, box in enumerate(bboxes):
@@ -277,7 +206,6 @@ if __name__ == "__main__":
                                 aug_labelXmax.append(box[2]+box[0])
                                 aug_labelYmax.append(box[3]+box[1])
 
-<<<<<<< HEAD
                             if way_id==10:
                                 for id, box in enumerate(mbboxes):
                                     aug_labelName.append(mlabelName[id])
@@ -286,18 +214,76 @@ if __name__ == "__main__":
                                     aug_labelXmax.append( int(int(box[2]+box[0]) * w_ratio))
                                     aug_labelYmax.append( int(int(box[3]+box[1]) * h_ratio))
 
+
                             xml_file = augmentation.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
-=======
-                            #print("send:", aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax)
-                            xml_file = augmentation.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
-                            #print(xml_file)
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
                             xmlFilename = os.path.join(output_aug_labels, aug_filename + '.xml')
                             file_object = open(os.path.join(output_aug_labels, xmlFilename), "w")
                             file_object.write(xml_file)
                             file_object.close
-<<<<<<< HEAD
-=======
-                            #print("write to -->", os.path.join(output_aug_labels, xmlFilename))
->>>>>>> fe9a2e54977886a76bc3e1ecca9616dd2cf42e4f
+
+    #-------------- 4 splices --------------
+    print('Add 4 images splices')
+
+    augmentation.load_augdataset(output_aug_images)
+    augmentation.load_augnegs(output_aug_images)
+ 
+    for id, file in enumerate(tqdm(augmentation.augds_list)):
+        #print(file)
+        filename, file_extension = os.path.splitext(file)
+        file_extension = file_extension.lower()
+
+        if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
+
+            if os.path.exists(os.path.join(output_aug_labels, filename+".xml")):
+                image_path = os.path.join(output_aug_images, file)
+                xml_path = os.path.join(output_aug_labels, filename+".xml")
+
+                img = cv2.imread(image_path)
+                org_h, org_w = img.shape[0], img.shape[1]
+
+                for count_num in tqdm(range(0, img_aug_count)):
+                    labelName, bboxes = augmentation.getLabels(image_path, xml_path)
+
+                    aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax = [], [], [], [], []
+                    for id, box in enumerate(bboxes):
+                        aug_labelName.append(labelName[id])
+                        aug_labelXmin.append(box[0])
+                        aug_labelYmin.append(box[1])
+                        aug_labelXmax.append(box[2]+box[0])
+                        aug_labelYmax.append(box[3]+box[1])
+
+                    img, mfiles, ratios = augmentation.splice_4imgs(img)
+                    aug_filename = "{}_{}-{}-{}".format(filename, 'splice', '4imgs', count_num)
+                    #print(os.path.join(output_aug_images, aug_filename+file_extension))
+                    cv2.imwrite(os.path.join(output_aug_images, aug_filename+file_extension), img)
+                    for i, sfile in enumerate(mfiles):
+                        (w_ratio, h_ratio) = ratios[i]
+                        mfile_name, mfile_extension = os.path.splitext(sfile)
+                        mimg_path = os.path.join(output_aug_images, sfile)
+                        mxml_path = os.path.join(output_aug_labels, mfile_name+'.xml')
+                        mlabelName, mbboxes = augmentation.getLabels( mimg_path, mxml_path)
+
+                        for id, box in enumerate(mbboxes):
+                            aug_labelName.append(mlabelName[id])
+                            if i == 0:
+                                aug_labelXmin.append( org_w + int(box[0] * w_ratio))
+                                aug_labelYmin.append( int(box[1] * h_ratio))
+                                aug_labelXmax.append( org_w + int(int(box[2]+box[0]) * w_ratio))
+                                aug_labelYmax.append( int(int(box[3]+box[1]) * h_ratio))
+                            if i == 1:
+                                aug_labelXmin.append( int(box[0] * w_ratio))
+                                aug_labelYmin.append( org_h + int(box[1] * h_ratio))
+                                aug_labelXmax.append( int(int(box[2]+box[0]) * w_ratio))
+                                aug_labelYmax.append( org_h + int(int(box[3]+box[1]) * h_ratio))
+                            if i == 2:
+                                aug_labelXmin.append( org_w + int(box[0] * w_ratio))
+                                aug_labelYmin.append( org_h + int(box[1] * h_ratio))
+                                aug_labelXmax.append( org_w + int(int(box[2]+box[0]) * w_ratio))
+                                aug_labelYmax.append( org_h + int(int(box[3]+box[1]) * h_ratio))
+
+                    xml_file = augmentation.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
+                    xmlFilename = os.path.join(output_aug_labels, aug_filename + '.xml')
+                    file_object = open(os.path.join(output_aug_labels, xmlFilename), "w")
+                    file_object.write(xml_file)
+                    file_object.close
 
