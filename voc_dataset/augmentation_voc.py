@@ -6,13 +6,13 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_images = r'/WORK1/Reports/train_yolo_with_few_images/dataset/sources/images'
-dataset_labels = r'/WORK1/Reports/train_yolo_with_few_images/dataset/sources/labels'
-neg_images = r'/WORK1/Reports/train_yolo_with_few_images/dataset/negatives'
+dataset_images = r'D:\OneDrive\Model_Sale\crowd_human_water\final\images'
+dataset_labels = r'D:\OneDrive\Model_Sale\crowd_human_water\final\labels'
+neg_images = r'D:\OneDrive\Model_Sale\crowd_human_water\source\negatives_no_dolls'
 
-output_aug_images = r'/WORK1/Reports/train_yolo_with_few_images/train_full_aug/images'
-output_aug_labels = r'/WORK1/Reports/train_yolo_with_few_images/train_full_aug/labels'
-output_aug_negs = r'/WORK1/Reports/train_yolo_with_few_images/train_full_aug/negatives'
+output_aug_images = r'D:\works\crowd_human_water_small_size\aug_images'
+output_aug_labels = r'D:\works\crowd_human_water_small_size\aug_labels'
+output_aug_negs = r'D:\works\crowd_human_water_small_size\negatives'
 
 gen_aug_negatives = False
 img_aug_count = 1
@@ -83,8 +83,8 @@ if __name__ == "__main__":
                 image_path = os.path.join(neg_images, file)
 
                 for count_num in range(0, img_aug_count):
-                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
+                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
+                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
                     for con_id in ways:
                         cimg = cv2.imread(image_path)
                         try:
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
                         cimg = augmentation.do_imgchange(cimg, ways[con_id])
                         #for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
-                        for way_id in [ 0, 1, 2, 3, 4, 5, 6, 7, 9, 11]:
+                        for way_id in [ 0, 11]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(20,50))
@@ -143,8 +143,8 @@ if __name__ == "__main__":
 
                 for count_num in tqdm(range(0, img_aug_count)):
                     
-                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
+                    #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
+                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
                     for con_id in ways:
                         img_org = cv2.imread(image_path)
                         try:
@@ -157,8 +157,8 @@ if __name__ == "__main__":
                         cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                         #print('way:', ways[con_id]) 
 
-                        #for way_id in tqdm([ 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
-                        for way_id in [ 0,1,2,3 ]:
+                        for way_id in tqdm([ 0, 11, 8, 10]):
+                        #for way_id in [ 0,1,2,3 ]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(5,25))
@@ -222,68 +222,12 @@ if __name__ == "__main__":
                             file_object.close
 
     #-------------- 4 splices --------------
-    print('Add 4 images splices')
+
 
     augmentation.load_augdataset(output_aug_images)
     augmentation.load_augnegs(output_aug_images)
- 
-    for id, file in enumerate(tqdm(augmentation.augds_list)):
-        #print(file)
-        filename, file_extension = os.path.splitext(file)
-        file_extension = file_extension.lower()
 
-        if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
-
-            if os.path.exists(os.path.join(output_aug_labels, filename+".xml")):
-                image_path = os.path.join(output_aug_images, file)
-                xml_path = os.path.join(output_aug_labels, filename+".xml")
-
-                img = cv2.imread(image_path)
-                org_h, org_w = img.shape[0], img.shape[1]
-
-                for count_num in tqdm(range(0, img_aug_count)):
-                    labelName, bboxes = augmentation.getLabels(image_path, xml_path)
-
-                    aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax = [], [], [], [], []
-                    for id, box in enumerate(bboxes):
-                        aug_labelName.append(labelName[id])
-                        aug_labelXmin.append(box[0])
-                        aug_labelYmin.append(box[1])
-                        aug_labelXmax.append(box[2]+box[0])
-                        aug_labelYmax.append(box[3]+box[1])
-
-                    img, mfiles, ratios = augmentation.splice_4imgs(img)
-                    aug_filename = "{}_{}-{}-{}".format(filename, 'splice', '4imgs', count_num)
-                    #print(os.path.join(output_aug_images, aug_filename+file_extension))
-                    cv2.imwrite(os.path.join(output_aug_images, aug_filename+file_extension), img)
-                    for i, sfile in enumerate(mfiles):
-                        (w_ratio, h_ratio) = ratios[i]
-                        mfile_name, mfile_extension = os.path.splitext(sfile)
-                        mimg_path = os.path.join(output_aug_images, sfile)
-                        mxml_path = os.path.join(output_aug_labels, mfile_name+'.xml')
-                        mlabelName, mbboxes = augmentation.getLabels( mimg_path, mxml_path)
-
-                        for id, box in enumerate(mbboxes):
-                            aug_labelName.append(mlabelName[id])
-                            if i == 0:
-                                aug_labelXmin.append( org_w + int(box[0] * w_ratio))
-                                aug_labelYmin.append( int(box[1] * h_ratio))
-                                aug_labelXmax.append( org_w + int(int(box[2]+box[0]) * w_ratio))
-                                aug_labelYmax.append( int(int(box[3]+box[1]) * h_ratio))
-                            if i == 1:
-                                aug_labelXmin.append( int(box[0] * w_ratio))
-                                aug_labelYmin.append( org_h + int(box[1] * h_ratio))
-                                aug_labelXmax.append( int(int(box[2]+box[0]) * w_ratio))
-                                aug_labelYmax.append( org_h + int(int(box[3]+box[1]) * h_ratio))
-                            if i == 2:
-                                aug_labelXmin.append( org_w + int(box[0] * w_ratio))
-                                aug_labelYmin.append( org_h + int(box[1] * h_ratio))
-                                aug_labelXmax.append( org_w + int(int(box[2]+box[0]) * w_ratio))
-                                aug_labelYmax.append( org_h + int(int(box[3]+box[1]) * h_ratio))
-
-                    xml_file = augmentation.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
-                    xmlFilename = os.path.join(output_aug_labels, aug_filename + '.xml')
-                    file_object = open(os.path.join(output_aug_labels, xmlFilename), "w")
-                    file_object.write(xml_file)
-                    file_object.close
+    print('Add 4 images splices') 
+    for file in tqdm(augmentation.augds_list):
+        augmentation.mosaic_4imgs(file)
 

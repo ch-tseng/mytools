@@ -358,6 +358,7 @@ class augment():
         return img, mask
 
     def getLabels(self, imgFile, xmlFile):
+        print(xmlFile)
         labelXML = minidom.parse(xmlFile)
         labelName = []
         labelXmin = []
@@ -627,5 +628,63 @@ class augment():
                         file_object.close
                         #print("write to -->", os.path.join(output_aug_labels, xmlFilename))
 
+        def mosaic_4imgs(self, file):
+            #print(file)
+            filename, file_extension = os.path.splitext(file)
+            file_extension = file_extension.lower()
 
+            if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
+
+                if os.path.exists(os.path.join(output_aug_labels, filename+".xml")):
+                    image_path = os.path.join(output_aug_images, file)
+                    xml_path = os.path.join(output_aug_labels, filename+".xml")
+
+                    img = cv2.imread(image_path)
+                    org_h, org_w = img.shape[0], img.shape[1]
+
+                    for count_num in tqdm(range(0, img_aug_count)):
+                        labelName, bboxes = self.getLabels(image_path, xml_path)
+
+                        aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax = [], [], [], [], []
+                        for id, box in enumerate(bboxes):
+                            aug_labelName.append(labelName[id])
+                            aug_labelXmin.append(box[0])
+                            aug_labelYmin.append(box[1])
+                            aug_labelXmax.append(box[2]+box[0])
+                            aug_labelYmax.append(box[3]+box[1])
+
+                        img, mfiles, ratios = self.splice_4imgs(img)
+                        aug_filename = "{}_{}-{}-{}".format(filename, 'splice', '4imgs', count_num)
+                        #print(os.path.join(output_aug_images, aug_filename+file_extension))
+                        cv2.imwrite(os.path.join(output_aug_images, aug_filename+file_extension), img)
+                        for i, sfile in enumerate(mfiles):
+                            (w_ratio, h_ratio) = ratios[i]
+                            mfile_name, mfile_extension = os.path.splitext(sfile)
+                            mimg_path = os.path.join(output_aug_images, sfile)
+                            mxml_path = os.path.join(output_aug_labels, mfile_name+'.xml')
+                            mlabelName, mbboxes = self.getLabels( mimg_path, mxml_path)
+
+                            for id, box in enumerate(mbboxes):
+                                aug_labelName.append(mlabelName[id])
+                                if i == 0:
+                                    aug_labelXmin.append( org_w + int(box[0] * w_ratio))
+                                    aug_labelYmin.append( int(box[1] * h_ratio))
+                                    aug_labelXmax.append( org_w + int(int(box[2]+box[0]) * w_ratio))
+                                    aug_labelYmax.append( int(int(box[3]+box[1]) * h_ratio))
+                                if i == 1:
+                                    aug_labelXmin.append( int(box[0] * w_ratio))
+                                    aug_labelYmin.append( org_h + int(box[1] * h_ratio))
+                                    aug_labelXmax.append( int(int(box[2]+box[0]) * w_ratio))
+                                    aug_labelYmax.append( org_h + int(int(box[3]+box[1]) * h_ratio))
+                                if i == 2:
+                                    aug_labelXmin.append( org_w + int(box[0] * w_ratio))
+                                    aug_labelYmin.append( org_h + int(box[1] * h_ratio))
+                                    aug_labelXmax.append( org_w + int(int(box[2]+box[0]) * w_ratio))
+                                    aug_labelYmax.append( org_h + int(int(box[3]+box[1]) * h_ratio))
+
+                        xml_file = self.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
+                        xmlFilename = os.path.join(output_aug_labels, aug_filename + '.xml')
+                        file_object = open(os.path.join(output_aug_labels, xmlFilename), "w")
+                        file_object.write(xml_file)
+                        file_object.close
 #------------------------------------------------------------------------------
