@@ -12,8 +12,8 @@ import time
 import datetime
 from tqdm import tqdm
 
-videoFolder = r"D:\Projects\ModelSale_Humancrowded_swimming\DataSource\videos"
-framesSavePath = r"D:\Projects\ModelSale_Humancrowded_swimming\DataSource\extrated_frames"
+videoFolder = r"C:\Users\ch.tseng\Videos\Download Videos"
+framesSavePath = r"E:\temp\extrated_frames"
 resizeWidth = 960
 rotate = 0
 interval = 30 #frames
@@ -40,14 +40,21 @@ for id, vfile in tqdm(enumerate(os.listdir(videoFolder))):
 
         camera = cv2.VideoCapture(os.path.join(videoFolder, vfile))
         length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        filename = filename.replace(' ', '')
+        filename = filename.replace("'", '')
+        filename = filename.replace("\\", '')
+        filename = filename.replace(".", '')
+        filename = filename.replace("\"", '')
+        filename = filename.replace("“",'')
+        filename = filename.replace("”",'')
         extract_folder = os.path.join(framesSavePath, filename)
         if not os.path.exists(extract_folder):
             os.makedirs(extract_folder)
 
-        i = 0
-        #while(grabbed is True):
-        for frameid in tqdm(range(0,length)):
-            (grabbed, img) = camera.read()
+        i, frameid = 0, 0
+        (grabbed, img) = camera.read()
+        while(grabbed is True):
 
             if(rotate>0):
                 img = imutils.rotate_bound(img, rotate)
@@ -71,8 +78,8 @@ for id, vfile in tqdm(enumerate(os.listdir(videoFolder))):
                         os.makedirs(extract_folder)
 
                     cv2.imwrite(os.path.join(extract_folder,filename), img)
-                    #print("{} saved.".format(os.path.join(extract_folder,filename)))
+                    print('write to', os.path.join(extract_folder,filename))
 
                     i += 1
-
+            frameid += 1
             (grabbed, img) = camera.read()
