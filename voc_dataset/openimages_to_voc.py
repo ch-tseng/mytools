@@ -4,38 +4,48 @@ import os, glob
 import pathlib
 from PIL import Image
 import cv2
+import sys
 
-'''
-/m/0k4j,Car
-/m/04_sv,Motorcycle
-/m/07r04,Truck
-/m/0199g,Bicycle
-/m/01bjv,Bus
-/m/0h2r6,Van
+class_mapping = 'class-descriptions-boxable.csv'
+#want_class_list = { "Car", "Motorcycle", "Truck", "Bicycle", "Bus", "Van" }
 
-
-/m/01bl7v,Boy
-/m/05r655,Girl
-
-/m/0dzct,Human face
-/m/02p0tk3,Human body
-/m/03bt1vf,Woman
-/m/04hgtk,Human head
-/m/04yx4,Man
-'''
-
-target_class = { "/m/0k4j":"Car", "/m/04_sv":"Motorcycle", "/m/07r04":"Truck", "/m/0199g":"Bicycle", "/m/01bjv":"Bus", "/m/0h2r6":"Van" }
-annotations_path = "/mnt/Open DataSet/train-annotations-bbox.csv"
-images_path = "/mnt/Open DataSet/train_00/"
+want_class_list = [ "Snake", "Crocodile", "Frog", "Turtle", "Tortoise", "Sea turtle", "Invertebrate", "Lizard", "Reptile", "Otter", "Jellyfish"]
+annotations_path = "/media/chtseng/AIHD01/OpenImage_v6/Annotations/boxes/oidv6-train-annotations-bbox.csv"
+images_path = "/media/chtseng/AIHD01/OpenImage_v6/dataset/train/"
 
 xml_file = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #output
-datasetPath = "OpenImages_v5_Vehicles/"
+datasetPath = "/media/chtseng/modelSALE/inSale/OpenImages_Himant_reptiles/"
 imgPath = "images/"
 labelPath = "labels/"
 imgType = "jpg"  # jpg, png
+
+#----------------------------------------------------------------------------------------------------
+
+class_maps = {}
+revers_cmap = {}
+target_class = []
+class_mapping = 'class-descriptions-boxable.csv'
+with open(class_mapping, 'r', encoding='UTF-8') as cfile:
+    for line in cfile:
+        line = line.replace('\n', '')
+        cmap = line.split(',')
+        class_maps.update( { cmap[1]:cmap[0]} )
+        revers_cmap.update( { cmap[0]:cmap[1] })
+
+no_class_list = ''
+for i, want_class in enumerate(want_class_list):
+    if want_class not in class_maps:
+        if i>0: no_class_list += ','
+        no_class_list += want_class
+    else:
+        target_class.append(class_maps[want_class])
+
+if no_class_list != '':
+    print('No these class for OpenImage V6:', no_class_list)
+    sys.exit()
 
 def check_env():
     if not os.path.exists(os.path.join(datasetPath, imgPath)):
@@ -99,26 +109,26 @@ if __name__ == "__main__":
     total_lines = len(lines)
     for lineID, line in enumerate(lines):
         data_annotations = line.split(',')
-        if(len(data_annotations)==13):
+        if(len(data_annotations)==21):
             class_id = data_annotations[2]
             if(class_id in target_class):
                 file_name = data_annotations[0]
                 type_anno = data_annotations[2]
 
                 minx,maxx,miny,maxy = data_annotations[4], data_annotations[5], data_annotations[6], data_annotations[7]
-
+                print('minx,maxx,miny,maxy ', minx,maxx,miny,maxy )
                 if(file_name in file_list):
                     #print(file_list)
                     last_data = file_list[file_name]
                     #print("last_data 1:", last_data)
-                    last_data.append((target_class[type_anno], [minx,maxx,miny,maxy]))
+                    last_data.append((revers_cmap[type_anno], [minx,maxx,miny,maxy]))
                     #print("append:", (target_class[type_anno], [x,y,mx,my]))
                     #print("last_data 2:", last_data)
                     file_list.update( {file_name:last_data} )
                     #print("update file_list:", file_list)
 
                 else:
-                    file_list.update({ file_name:[(target_class[type_anno], [minx,maxx,miny,maxy])]})
+                    file_list.update({ file_name:[(revers_cmap[type_anno], [minx,maxx,miny,maxy])]})
 
 
     total_lines = len(file_list)
