@@ -42,17 +42,11 @@ def fps_count(total_frames):
     return fps
 
 
-def drawbox(img, box, txt, color):
-    cv2.rectangle(img, (box[0],box[1]), (box[0]+box[2],box[1]+box[3]), color, 2)
-    #cv2.putText(img, txt, (box[0], box[1]), cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 2)
-
-    return img
-
 if __name__ == "__main__":
 
     print('Push Q to quit the program.')
 
-    bcolors = [(255,255,0), (0,255,255), (255,0,0), (255,0,255) ]  #body, head
+    #bcolors = [(255,255,0), (0,255,255), (255,0,0), (255,0,255) ]  #body, head
 
     INPUT = cv2.VideoCapture(media)
 
@@ -69,8 +63,7 @@ if __name__ == "__main__":
     while hasFrame:
         img = frame.copy()
         frameID += 1
-        img = yolomodel.getObject(img, 0.25, 0.55, drawBox=True, bold=1, \
-                    textsize=0.6, bcolor=(0,0,255), tcolor=bcolors, char_type='Chinese')
+        img = yolomodel.getObject(img, 0.25, 0.55, drawBox=True, char_type='Chinese')
 
         cv2.imshow('test', imutils.resize(img, height=800))
         k = cv2.waitKey(1)

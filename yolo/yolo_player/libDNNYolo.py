@@ -1,5 +1,6 @@
 import time
 import cv2
+import random
 import numpy as np
 import math
 import torch
@@ -34,6 +35,13 @@ class opencvYOLO:
             else:
                 dnn.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
                 dnn.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
+        tcolors = []
+        for id, cname in enumerate(self.classes):
+            tcolor = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
+            tcolors.append(tcolor)
+
+        self.tcolors = tcolors
 
         self.net = dnn
 
@@ -120,9 +128,10 @@ class opencvYOLO:
         # Get the names of the output layers, i.e. the layers with unconnected outputs
         return [layersNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
-    def postprocess(self, frame, outs, labelWant, drawBox, bold, textsize, bcolor, tcolor):
+    def postprocess(self, frame, outs, labelWant, drawBox, bold, textsize):
         frameHeight = frame.shape[0]
         frameWidth = frame.shape[1]
+        tcolors = self.tcolors
  
         classIds = []
         labelName = []
@@ -130,8 +139,8 @@ class opencvYOLO:
         boxes = []
         boxbold = []
         labelsize = []
-        boldcolor = []
-        textcolor = []
+        #boldcolor = []
+        #textcolor = []
 
         for out in outs:
             for detection in out:
@@ -153,8 +162,8 @@ class opencvYOLO:
                     boxbold.append(bold)
                     labelName.append(label)
                     labelsize.append(textsize)
-                    boldcolor.append(bcolor)
-                    textcolor.append(tcolor)
+                    #boldcolor.append(bcolor)
+                    #textcolor.append(tcolor)
 
         # Perform non maximum suppression to eliminate redundant overlapping boxes with
         # lower confidences.
@@ -182,10 +191,10 @@ class opencvYOLO:
             nms_labelNames.append(labelName[i])
 
             if(drawBox==True):
-                txt_color = tcolor[classIds[i]]
+                txt_color = tcolors[classIds[i]]
 
                 frame = self.drawPred(frame, classIds[i], confidences[i], boxbold[i], txt_color,
-                    labelsize[i], left, top, left + width, top + height)
+                    left, top, left + width, top + height)
 
         self.bbox = nms_boxes
         self.classIds = nms_classIds
@@ -194,7 +203,7 @@ class opencvYOLO:
         self.frame = frame
         return frame
 
-    def drawPred(self, frame, className, conf, bold, textcolor, textsize, left, top, right, bottom, type='Chinese'):
+    def drawPred(self, frame, className, conf, bold, textcolor, left, top, right, bottom, type='Chinese'):
         if self.mtype == 'darknet':
             className = self.classes[int(className)]
 
@@ -211,8 +220,11 @@ class opencvYOLO:
         frame = self.bg_text(frame, label, (left+1, top+1), txtdata, type=type)
         return frame
 
-    def getObject(self, frame, score, nms, labelWant='', drawBox=False, bold=1, textsize=0.6, \
-            bcolor=(0,0,255), tcolor=(255,255,255), char_type='Chinese'):
+    def getObject(self, frame, score, nms, labelWant='', drawBox=False, char_type='Chinese'):
+        textsize = 0.8
+        tcolors = self.tcolors
+        bold = 1
+        if frame.shape[0]>720 and frame.shape[1]>1024: bold = 2
 
         if self.mtype == 'yolov5':
             self.net.conf = score  # confidence threshold (0-1)
@@ -230,10 +242,10 @@ class opencvYOLO:
                 cids.append(p['class'])
 
                 if(drawBox==True):
-                    txt_color = tcolor[p['class']]
+                    txt_color = tcolors[p['class']]
 
                     frame = self.drawPred(frame, p['name'], float(p['confidence']), bold, txt_color,
-                        textsize, xmin, ymin, xmax, ymax, type=char_type)
+                        xmin, ymin, xmax, ymax, type=char_type)
 
             self.bbox = bboxes
             self.classIds = cids
@@ -248,7 +260,7 @@ class opencvYOLO:
             # Runs the forward pass to get output of the output layers
             outs = net.forward(self.getOutputsNames(net))
             # Remove the bounding boxes with low confidence
-            frame = self.postprocess(frame, outs, labelWant, drawBox, bold, textsize, bcolor, tcolor)
+            frame = self.postprocess(frame, outs, labelWant, drawBox, bold, textsize)
             self.objCounts = len(self.indices)
             # Put efficiency information. The function getPerfProfile returns the 
             # overall time for inference(t) and the timings for each of the layers(in layersTimes)
