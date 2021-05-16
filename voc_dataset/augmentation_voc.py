@@ -14,10 +14,11 @@ output_aug_images = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_images'
 output_aug_labels = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_labels'
 output_aug_negs = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_negatives'
 
-gen_aug_negatives = False
-gen_aug_dataset = False
+gen_aug_negatives = True
+gen_aug_dataset = True
 gen_mosaic_imgs = True
 img_aug_count = 1
+mosaic_repeat_count = 2
 
 dataset_images = dataset_images.replace('\\', '/')
 dataset_labels = dataset_labels.replace('\\', '/')
@@ -228,11 +229,12 @@ if __name__ == "__main__":
     #-------------- 4 splices --------------
 
     if gen_mosaic_imgs is True:
-        augmentation.load_augdataset(output_aug_images)
-        augmentation.load_augnegs(output_aug_images)
+        for count in range(0, mosaic_repeat_count):
+            augmentation.load_augdataset(output_aug_images)
+            augmentation.load_augnegs(output_aug_images)
 
-        print('Add 4 images splices') 
-        for file in tqdm(augmentation.augds_list):
-            augmentation.mosaic_4imgs(file)
+            print('Add 4 images splices') 
+            for file in tqdm(augmentation.augds_list):
+                augmentation.mosaic_4imgs(file)
 
 
