@@ -526,6 +526,7 @@ class augment():
 
         (labelName, labelXmin, labelYmin, labelXmax, labelYmax) = bboxes
         for id in range(0, len(labelName)):
+            #print('test', labelName, (labelXmin, labelYmin, labelXmax, labelYmax))
             xmlObject = xmlObject + self.writeObjects(labelName[id], (labelXmin[id], labelYmin[id], labelXmax[id], labelYmax[id]))
             #print(xmlObject)
             #print("----------------------------------------------------------------------")
@@ -630,6 +631,10 @@ class augment():
                             aug_labelYmax.append(box[3]+box[1])
 
                         #print("send:", aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax)
+                        if len(aug_labelName) != len(aug_labelXmin):
+                            print('error, bbox counts not same with names', file)
+                            continue
+
                         xml_file = self.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
                         #print(xml_file)
                         xmlFilename = os.path.join(output_aug_labels, aug_filename + '.xml')
@@ -672,7 +677,10 @@ class augment():
                         mfile_name, mfile_extension = os.path.splitext(sfile)
                         mimg_path = os.path.join(self.output_aug_images, sfile)
                         mxml_path = os.path.join(self.output_aug_labels, mfile_name+'.xml')
-                        mlabelName, mbboxes = self.getLabels( mimg_path, mxml_path)
+                        try:
+                            mlabelName, mbboxes = self.getLabels( mimg_path, mxml_path)
+                        except:
+                            continue
 
                         for id, box in enumerate(mbboxes):
                             aug_labelName.append(mlabelName[id])
@@ -707,6 +715,10 @@ class augment():
                                     aug_labelYmin.append( y1)
                                     aug_labelXmax.append( x2)
                                     aug_labelYmax.append( y2)
+
+                    if len(aug_labelName) != len(aug_labelXmin):
+                        print('error, bbox counts not same with names', file)
+                        continue
 
                     xml_file = self.makeDatasetFile(img, file, (aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax))
                     xmlFilename = os.path.join(self.output_aug_labels, aug_filename + '.xml')

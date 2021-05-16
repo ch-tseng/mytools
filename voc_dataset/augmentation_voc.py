@@ -6,16 +6,16 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_images = r'dataset_horizontal_added/images'
-dataset_labels = r'dataset_horizontal_added/labels'
-neg_images = r'dataset_horizontal_added/negatives'
+dataset_images = r'/WORKS/modelSale/Himant/dataet_reptiles/images'
+dataset_labels = r'/WORKS/modelSale/Himant/dataet_reptiles/labels'
+neg_images = r'/WORKS/modelSale/Himant/dataet_reptiles/negatives'
 
-output_aug_images = r'dataset_horizontal_added/aug_images'
-output_aug_labels = r'dataset_horizontal_added/aug_labels'
-output_aug_negs = r'dataset_horizontal_added/negatives'
+output_aug_images = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_images'
+output_aug_labels = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_labels'
+output_aug_negs = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_negatives'
 
 gen_aug_negatives = False
-gen_aug_dataset = True
+gen_aug_dataset = False
 gen_mosaic_imgs = True
 img_aug_count = 1
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
                         cimg = augmentation.do_imgchange(cimg, ways[con_id])
                         #for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
-                        for way_id in [ 0, 9, 11]:
+                        for way_id in [ 0, 11]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(20,50))
