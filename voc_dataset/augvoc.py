@@ -369,7 +369,12 @@ class augment():
 
     def getLabels(self, imgFile, xmlFile):
         #print(xmlFile)
-        labelXML = minidom.parse(xmlFile)
+        try:
+            labelXML = minidom.parse(xmlFile)
+        except:
+            print("error, cannot parse xml:", xmlFile)
+            return [], []
+
         labelName = []
         labelXmin = []
         labelYmin = []
