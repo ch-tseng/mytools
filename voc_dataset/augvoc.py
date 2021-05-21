@@ -688,6 +688,11 @@ class augment():
                             continue
 
                         for id, box in enumerate(mbboxes):
+                            th_width, th_height = 4, 4
+                            if (box[2] * w_ratio < th_width) or (box[3] * h_ratio < th_height):
+                                continue
+
+
                             aug_labelName.append(mlabelName[id])
                             if i == 0:
                                 x1 = org_w + int(box[0] * w_ratio)
