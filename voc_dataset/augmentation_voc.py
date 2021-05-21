@@ -6,13 +6,13 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_images = r'/WORKS/modelSale/Himant/dataet_reptiles/images'
-dataset_labels = r'/WORKS/modelSale/Himant/dataet_reptiles/labels'
-neg_images = r'/WORKS/modelSale/Himant/dataet_reptiles/negatives'
+dataset_images = r'/WORKS/modelSale/FaceMask_Mine/images'
+dataset_labels = r'/WORKS/modelSale/FaceMask_Mine/labels'
+neg_images = r'/WORKS/modelSale/FaceMask_Mine/negatives'
 
-output_aug_images = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_images'
-output_aug_labels = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_labels'
-output_aug_negs = r'/WORKS/modelSale/Himant/dataet_reptiles/aug_negatives'
+output_aug_images = r'/WORKS/modelSale/FaceMask_Mine/aug_images'
+output_aug_labels = r'/WORKS/modelSale/FaceMask_Mine/aug_labels'
+output_aug_negs = r'/WORKS/modelSale/FaceMask_Mine/aug_negatives'
 
 gen_aug_negatives = True
 gen_aug_dataset = True
@@ -162,7 +162,7 @@ if __name__ == "__main__":
                             cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
-                            for way_id in tqdm([ 0, 11, 8, 10]):
+                            for way_id in tqdm([ 0, 11]):
                             #for way_id in [ 0,1,2,3 ]:
                                 img = cimg.copy()
                                 if(way_id == 1):
