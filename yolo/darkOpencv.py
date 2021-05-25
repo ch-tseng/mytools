@@ -30,6 +30,11 @@ class darknetDetect:
         self.class_names = class_names
         self.class_colors = class_colors
 
+        width = darknet.network_width(network)
+        height = darknet.network_height(network)
+        self.width = width
+        self.height = height
+
     def check_batch_shape(self, images, batch_size):
         """
             Image sizes should be the same width and height
@@ -56,8 +61,8 @@ class darknetDetect:
     def image_detection(self, image, network, class_names, class_colors, thresh):
         # Darknet doesn't accept numpy images.
         # Create one with image we reuse for each detect
-        width = darknet.network_width(network)
-        height = darknet.network_height(network)
+        width = self.width
+        height = self.height
         darknet_image = darknet.make_image(width, height, 3)
 
         #image = cv2.imread(image_path)
@@ -73,8 +78,8 @@ class darknetDetect:
         return cv2.cvtColor(image, cv2.COLOR_BGR2RGB), detections
 
     def image_classification(self, image, network, class_names):
-        width = darknet.network_width(network)
-        height = darknet.network_height(network)
+        width = self.width
+        height = self.height
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_resized = cv2.resize(image_rgb, (width, height),
                                     interpolation=cv2.INTER_LINEAR)
@@ -121,8 +126,8 @@ class darknetDetect:
             if append is True:
                 x1, y1, x2, y2 = self.bbox2points(bbox)
                 #(x, y, w, h) = (x1, y1, x2-x1, y2-y1)
-                ratio_x = img.shape[1]/416
-                ratio_y = img.shape[0]/416
+                ratio_x = img.shape[1]/self.width
+                ratio_y = img.shape[0]/self.height
                 (x, y, w, h) = (x1 * ratio_x, y1*ratio_y, (x2-x1)*ratio_x, (y2-y1)*ratio_y)
                 #label = self.class_names.index(label)
                 #bboxes.append( [int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])] )
