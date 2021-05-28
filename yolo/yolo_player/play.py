@@ -4,23 +4,40 @@ import imutils
 import time
 import random
 
-
-yolomodel = opencvYOLO( \
-    mtype='yolov5', imgsize=(640,640), \
-    objnames='models/yolov5/obj.names', \
-    weights='models/yolov5/yolov5s_bodyparts.pt', \
-    darknetcfg='', score=0.25, nms=0.55, gpu=True)
-'''
-yolomodel = opencvYOLO( \
-    mtype='darknet', imgsize=(608,608), \
-    objnames='models/yolov3/obj.names', \
-    weights='models/yolov3/yolov3_last.weights', \
-    darknetcfg='models/yolov3/yolov3.cfg', \
-    score=0.25, nms=0.55, gpu=True)
-'''
-media = "../../modelSale/Himant/demo.mp4"
+media = r"D:\OneDrive\Model_Sale\crowd_human\crowd_humang\videos\demo.mp4"
 write_video = False
-video_out = "demo.avi"
+video_out = "D:\OneDrive\Model_Sale\crowd_human\crowd_humang\videos\demo.avi"
+
+yolo_type = 'yolov5'  #yolov5 or darknet
+model_size = (640,640)
+path_objname = r"D:\OneDrive\Model_Sale\crowd_human\crowd_humang\YOLO5_v2\yolo5s_640\obj.names"
+path_weights = r"D:\OneDrive\Model_Sale\crowd_human\crowd_humang\YOLO5_v2\yolo5s_640\crowd_human.pt"
+path_darknetcfg = r""
+score = 0.25
+nms = 0.55
+gpu = False
+
+#----------------------------------------------------------------------
+
+media = media.replace('\\', '/')
+video_out = video_out.replace('\\', '/')
+path_objname = path_objname.replace('\\', '/')
+path_weights = path_weights.replace('\\', '/')
+path_darknetcfg = path_darknetcfg.replace('\\', '/')
+
+if path_weights[-2:] == 'pt':
+    yolomodel = opencvYOLO( \
+        mtype='yolov5', imgsize=model_size, \
+        objnames=path_objname, \
+        weights=path_weights, \
+        darknetcfg='', score=score, nms=nms, gpu=gpu)
+else:
+    yolomodel = opencvYOLO( \
+        mtype='darknet', imgsize=model_size, \
+        objnames=path_objname, \
+        weights=path_weights, \
+        darknetcfg=path_darknetcfg, \
+        score=score, nms=nms, gpu=gpu)
 
 start = time.time()
 last_time = time.time()
