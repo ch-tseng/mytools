@@ -6,13 +6,19 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_images = r'/WORKS/modelSale/FaceMask_Mine/images'
-dataset_labels = r'/WORKS/modelSale/FaceMask_Mine/labels'
-neg_images = r'/WORKS/modelSale/FaceMask_Mine/negatives'
+dataset_base = r'/WORKING/modelSale/forklift/'
+output_base = r'/WORKING/modelSale/forklift/'
 
-output_aug_images = r'/WORKS/modelSale/FaceMask_Mine/aug_images'
-output_aug_labels = r'/WORKS/modelSale/FaceMask_Mine/aug_labels'
-output_aug_negs = r'/WORKS/modelSale/FaceMask_Mine/aug_negatives'
+dataset_base = dataset_base.replace('\\', '/')
+output_base = output_base.replace('\\', '/')
+
+dataset_images = os.path.join(dataset_base, 'images')
+dataset_labels = os.path.join(dataset_base, 'labels')
+neg_images = os.path.join(dataset_base, 'negatives')
+
+output_aug_images = os.path.join(output_base, 'aug_images')
+output_aug_labels = os.path.join(output_base, 'aug_labels')
+output_aug_negs = os.path.join(output_base, 'aug_negatives')
 
 gen_aug_negatives = True
 gen_aug_dataset = True
