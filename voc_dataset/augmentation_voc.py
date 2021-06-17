@@ -20,6 +20,7 @@ output_aug_images = os.path.join(output_base, 'aug_images')
 output_aug_labels = os.path.join(output_base, 'aug_labels')
 output_aug_negs = os.path.join(output_base, 'aug_negatives')
 
+threshold_wh = (9,9)  #min size for augmented box
 gen_aug_negatives = True
 gen_aug_dataset = True
 gen_mosaic_imgs = True
@@ -79,7 +80,7 @@ def pick_ds_file(ds_files):
 
 if __name__ == "__main__":
     augmentation = augment(dataset_images, dataset_labels, neg_images, output_aug_images, output_aug_labels, \
-        diverse_1=diverse_1, diverse_2=diverse_2,img_aug_count=img_aug_count)
+        diverse_1=diverse_1, diverse_2=diverse_2,img_aug_count=img_aug_count, threshold_wh=threshold_wh)
 
     if gen_aug_negatives == True:
         #augmentation.auto_make(img_aug_count, type_count)
@@ -168,7 +169,7 @@ if __name__ == "__main__":
                             cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
-                            for way_id in tqdm([ 0, 11]):
+                            for way_id in tqdm([ 0, 8, 11]):
                             #for way_id in [ 0,1,2,3 ]:
                                 img = cimg.copy()
                                 if(way_id == 1):

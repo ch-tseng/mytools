@@ -8,7 +8,7 @@ import numpy as np
 import glob
 
 class augment():
-    def __init__(self, dataset_images, dataset_labels, neg_images, output_img_path, output_xml_path, diverse_1=None, diverse_2=None, img_aug_count=1):
+    def __init__(self, dataset_images, dataset_labels, neg_images, output_img_path, output_xml_path, diverse_1=None, diverse_2=None, img_aug_count=1, threshold_wh=(5,5)):
         self.xml_file1 = "xml_file.txt"
         self.xml_file2 = "xml_object.txt"
         self.dataset_images = dataset_images
@@ -17,6 +17,8 @@ class augment():
         self.output_aug_labels = output_xml_path
         self.neg_images = neg_images
         self.img_aug_count = img_aug_count
+        self.th_w = threshold_wh[0]
+        self.th_h = threshold_wh[1]
 
         if(diverse_1 is None):
             self.diverse_1 = {
@@ -473,9 +475,10 @@ class augment():
             #for c in contours:
             if(len(contours)>0):
                 (nx, ny, nw, nh) = cv2.boundingRect(contours[0])
-                boxes.append([nx,ny, nw, nh])
-                labels.append(labellist[id])
-            #cv2.rectangle(frame, (left,top), (right,bottom), (255, 0, 0), 2)
+                if nw>=self.th_w and nh>=self.th_h:
+                    boxes.append([nx,ny, nw, nh])
+                    labels.append(labellist[id])
+                    #cv2.rectangle(frame, (left,top), (right,bottom), (255, 0, 0), 2)
 
         return cimg, boxes, labels
 
