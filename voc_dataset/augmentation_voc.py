@@ -21,11 +21,11 @@ output_aug_labels = os.path.join(output_base, 'aug_labels')
 output_aug_negs = os.path.join(output_base, 'aug_negatives')
 
 threshold_wh = (9,9)  #min size for augmented box
-gen_aug_negatives = True
+gen_aug_negatives = False
 gen_aug_dataset = True
 gen_mosaic_imgs = True
 img_aug_count = 1
-mosaic_repeat_count = 2
+mosaic_repeat_count = 1
 
 dataset_images = dataset_images.replace('\\', '/')
 dataset_labels = dataset_labels.replace('\\', '/')
@@ -169,7 +169,7 @@ if __name__ == "__main__":
                             cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
-                            for way_id in tqdm([ 0, 8, 11]):
+                            for way_id in tqdm([ 0, 5, 8, 11]):
                             #for way_id in [ 0,1,2,3 ]:
                                 img = cimg.copy()
                                 if(way_id == 1):
