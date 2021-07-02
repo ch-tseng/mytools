@@ -1,0 +1,10 @@
+    {
+      "label": "%LABEL%",
+      "line_color": null,
+      "fill_color": null,
+      "points": [ 
+%POINTS%
+        ],
+      "shape_type": "polygon",
+      "flags": {}
+    }
