@@ -6,8 +6,8 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_base = r'/WORKING/modelSale/forklift/'
-output_base = r'/WORKING/modelSale/forklift/'
+dataset_base = r'/WORKING/modelSale/crowd_human_sport/dataset/'
+output_base = r'/WORKING/modelSale/crowd_human_sport/dataset/aug'
 
 dataset_base = dataset_base.replace('\\', '/')
 output_base = output_base.replace('\\', '/')
@@ -16,12 +16,13 @@ dataset_images = os.path.join(dataset_base, 'images')
 dataset_labels = os.path.join(dataset_base, 'labels')
 neg_images = os.path.join(dataset_base, 'negatives')
 
+output_resize = 960  #0 no resize
 output_aug_images = os.path.join(output_base, 'aug_images')
 output_aug_labels = os.path.join(output_base, 'aug_labels')
 output_aug_negs = os.path.join(output_base, 'aug_negatives')
 
 threshold_wh = (9,9)  #min size for augmented box
-gen_aug_negatives = False
+gen_aug_negatives = True
 gen_aug_dataset = True
 gen_mosaic_imgs = True
 img_aug_count = 1
@@ -105,7 +106,7 @@ if __name__ == "__main__":
 
                         cimg = augmentation.do_imgchange(cimg, ways[con_id])
                         #for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
-                        for way_id in [ 0, 11]:
+                        for way_id in [ 0, 4, 6, 9, 11]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(20,50))
@@ -153,23 +154,41 @@ if __name__ == "__main__":
                     image_path = os.path.join(dataset_images, file)
                     xml_path = os.path.join(dataset_labels, filename+".xml")
 
+                    img_org = cv2.imread(image_path)
+                    try:
+                        test = img_org.shape
+                    except:
+                        print('error, cannot read', image_path, 'pass')
+                        continue
+
+                    resize_ratio = 1.0
+                    if output_resize>0:
+                        ow, oh = img_org.shape[1], img_org.shape[0]
+                        if ow>oh:
+                            resize_ratio = 960/ow
+                            nw, nh = 960, int(oh*resize_ratio)
+                        else:
+                            resize_ratio = 960/oh
+                            nw, nh = int(ow*resize_ratio), 960
+
+                        img_org = cv2.resize(img_org, (nw, nh))
+
                     for count_num in tqdm(range(0, img_aug_count)):
-                        
                         #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                        ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
+                        ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip' }
                         for con_id in ways:
-                            img_org = cv2.imread(image_path)
+                            #img_org = cv2.imread(image_path)
                             try:
                                 test = img_org.shape
                             except:
                                 break
 
-                            labelName, bboxes = augmentation.getLabels(image_path, xml_path)
+                            labelName, bboxes = augmentation.getLabels(image_path, xml_path, resize_ratio)
 
                             cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
-                            for way_id in tqdm([ 0, 5, 8, 11]):
+                            for way_id in tqdm([ 0, 8, 9, 11]):
                             #for way_id in [ 0,1,2,3 ]:
                                 img = cimg.copy()
                                 if(way_id == 1):
