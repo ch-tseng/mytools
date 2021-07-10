@@ -369,7 +369,7 @@ class augment():
 
         return img, mask
 
-    def getLabels(self, imgFile, xmlFile):
+    def getLabels(self, imgFile, xmlFile, ratio):
         #print(xmlFile)
         try:
             labelXML = minidom.parse(xmlFile)
@@ -408,7 +408,9 @@ class augment():
 
         bboxes = []
         for i in range(0, len(labelName)):
-            bboxes.append( [labelXmin[i], labelYmin[i], labelXmax[i]-labelXmin[i], labelYmax[i]-labelYmin[i]])
+            bboxes.append( [ int(labelXmin[i]*ratio), int(labelYmin[i]*ratio), \
+                             int( (labelXmax[i]-labelXmin[i])*ratio), \
+                             int( (labelYmax[i]-labelYmin[i])*ratio) ])
 
         return labelName, bboxes
 
@@ -568,7 +570,7 @@ class augment():
         return xmlContent
         #print("write to -->", os.path.join(output_aug_labels, xmlFilename))
 
-    def auto_make(self, img_aug_count, type_count):
+    def auto_make(self, img_aug_count, type_count, ratio):
 
         dataset_images = self.dataset_images
         dataset_labels = self.dataset_labels
@@ -588,7 +590,7 @@ class augment():
                 if os.path.exists(os.path.join(dataset_labels, filename+".xml")):
                     image_path = os.path.join(dataset_images, file)
                     xml_path = os.path.join(dataset_labels, filename+".xml")
-                    labelName, bboxes = self.getLabels(image_path, xml_path)
+                    labelName, bboxes = self.getLabels(image_path, xml_path, ratio)
                     #print("Grepped from XML: ", labelName, bboxes )
 
                     img_org = cv2.imread(image_path)
@@ -666,7 +668,7 @@ class augment():
                 org_h, org_w = img.shape[0], img.shape[1]
 
                 for count_num in range(0, self.img_aug_count):
-                    labelName, bboxes = self.getLabels(image_path, xml_path)
+                    labelName, bboxes = self.getLabels(image_path, xml_path, 1.0)
 
                     aug_labelName, aug_labelXmin, aug_labelYmin, aug_labelXmax, aug_labelYmax = [], [], [], [], []
                     for id, box in enumerate(bboxes):
@@ -686,7 +688,7 @@ class augment():
                         mimg_path = os.path.join(self.output_aug_images, sfile)
                         mxml_path = os.path.join(self.output_aug_labels, mfile_name+'.xml')
                         try:
-                            mlabelName, mbboxes = self.getLabels( mimg_path, mxml_path)
+                            mlabelName, mbboxes = self.getLabels( mimg_path, mxml_path, 1.0)
                         except:
                             continue
 
