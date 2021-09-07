@@ -447,9 +447,17 @@ class augment():
             #cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
 
         if(type_diverse == 'flip'):
-            f_type = random.randint(-1,1)
+            f_type = -1)
             cimg = cv2.flip(img, f_type)
             #mask_img_org = cv2.flip(mask_img, f_type)
+
+        if(type_diverse == 'vflip'):
+            f_type = 0
+            cimg = cv2.flip(img, f_type)
+
+        if(type_diverse == 'hflip'):
+            f_type = 1
+            cimg = cv2.flip(img, f_type)
 
         for id, box in enumerate(bboxes):
             #create mask for the original image
