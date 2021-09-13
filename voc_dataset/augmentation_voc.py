@@ -6,8 +6,8 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_base = r'/WORKING/modelSale/crowd_human_sport/dataset/'
-output_base = r'/WORKING/modelSale/crowd_human_sport/dataset/aug'
+dataset_base = r'/WORKING/road_defects_d20_d21'
+output_base = r'/WORKING/road_defects_d20_d21/aug'
 
 dataset_base = dataset_base.replace('\\', '/')
 output_base = output_base.replace('\\', '/')
@@ -21,7 +21,7 @@ output_aug_images = os.path.join(output_base, 'aug_images')
 output_aug_labels = os.path.join(output_base, 'aug_labels')
 output_aug_negs = os.path.join(output_base, 'aug_negatives')
 
-threshold_wh = (9,9)  #min size for augmented box
+threshold_wh = (30,30)  #min size for augmented box
 gen_aug_negatives = True
 gen_aug_dataset = True
 gen_mosaic_imgs = True
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
                 for count_num in range(0, img_aug_count):
                     #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                    ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270' }
+                    ways = {0: 'no_change', 2:'rotate180', 4:'flip' }
                     for con_id in ways:
                         cimg = cv2.imread(image_path)
                         try:
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
                         cimg = augmentation.do_imgchange(cimg, ways[con_id])
                         #for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
-                        for way_id in [ 0, 4, 6, 9, 11]:
+                        for way_id in [ 0, 4, 5, 6, 9, 11]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(20,50))
@@ -173,9 +173,9 @@ if __name__ == "__main__":
 
                         img_org = cv2.resize(img_org, (nw, nh))
 
-                    for count_num in tqdm(range(0, img_aug_count)):
-                        #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                        ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip' }
+                    for count_num in range(0, img_aug_count):
+                        #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'hflip', 5:'vflip', 6:'flip', 7:'shift' }
+                        ways = {0: 'no_change', 1:'hflip' }
                         for con_id in ways:
                             #img_org = cv2.imread(image_path)
                             try:
@@ -188,7 +188,7 @@ if __name__ == "__main__":
                             cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
-                            for way_id in tqdm([ 0, 8, 9, 11]):
+                            for way_id in [ 0, 4, 5, 6, 9, 11]:
                             #for way_id in [ 0,1,2,3 ]:
                                 img = cimg.copy()
                                 if(way_id == 1):
@@ -260,7 +260,7 @@ if __name__ == "__main__":
             augmentation.load_augnegs(output_aug_images)
 
             print('Add 4 images splices') 
-            for file in tqdm(augmentation.augds_list):
+            for file in augmentation.augds_list:
                 augmentation.mosaic_4imgs(file)
 
 
