@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import cv2
-from imutils.face_utils import rect_to_bb
-import dlib
 import imutils
 import os, time
 import os.path
@@ -12,21 +10,20 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-width_resize = 420  #w
-datasetPath = "/media/sf_VMshare/v2"
+width_resize = 960  #w
+datasetPath = r"L:\Dataset\Mine\Plants\pepper_teach"
 imgPath = "images/"
 labelPath = "labels/"
 outputFolder = "resized/"
 
-folderCharacter = "/"  # \\ is for windows
 xml_samplefile = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #-------------------------------------------
-
-xml_path = datasetPath + folderCharacter + labelPath
-img_path = datasetPath + folderCharacter + imgPath
-out_path = datasetPath + folderCharacter + outputFolder
+datasetPath = datasetPath.replace('\\', '/')
+xml_path = os.path.join(datasetPath, labelPath)
+img_path = os.path.join(datasetPath, imgPath)
+out_path = os.path.join(datasetPath, outputFolder)
 
 def chkEnv():
     if not os.path.exists(datasetPath):
@@ -145,8 +142,8 @@ for file in os.listdir(img_path):
     if(file_extension == ".jpg" or file_extension==".jpeg" or file_extension==".png" or file_extension==".bmp"):
         img_file = file
         xml_file = filename + ".xml"
-        img_path = datasetPath + folderCharacter + imgPath + img_file
-        xml_path = datasetPath + folderCharacter + labelPath + xml_file
+        img_path = os.path.join(datasetPath, imgPath, img_file)
+        xml_path = os.path.join(datasetPath, labelPath, xml_file)
         #print("Processing: ", img_path)
 
         if(os.path.exists(xml_path)):
