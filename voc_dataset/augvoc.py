@@ -43,7 +43,7 @@ class augment():
                 'mosaic': [[5,25]],
                 'imgs_mosaic': [[2,4]],
                 'small2large': [[0.2, 0.5]],
-                'contrast_more': [[-30, 60]],
+                'contrast_more': [[-40, 40]],
                 'contrast_less': [[0.2, 2.5]],
                 'add_line': [[8]], #[max] border
                 'add_square': [[30,90], [30,90]], #[[minW, minH], [maxW, maxH]]
@@ -270,15 +270,15 @@ class augment():
     def blur_img(self, img):
         b_type = random.randint(0,4)
         if(b_type==0):
-            img = self.averaging_blur(img, size=random.randrange(3,11,2))
+            img = self.averaging_blur(img, size=random.randrange(3,9,2))
         elif(b_type==1):
-            img = self.gaussian_blur(img, size=random.randrange(3,11,2))
+            img = self.gaussian_blur(img, size=random.randrange(3,7,2))
         elif(b_type==2):
-            img = self.median_blur(img, size=random.randrange(5,25,2))
+            img = self.median_blur(img, size=random.randrange(3,17,2))
         elif(b_type==3):
-            img = self.bilateral_blur(img, size=random.randrange(5,25,2),  k1=random.randrange(30,90,2),  k2=random.randrange(30,90,2))
+            img = self.bilateral_blur(img, size=random.randrange(3,17,2),  k1=random.randrange(19,67,2),  k2=random.randrange(19,67,2))
         elif(b_type==4):
-            img = self.motion_blur(img, size=random.randrange(3,9,2))
+            img = self.motion_blur(img, size=random.randrange(3,7,2))
 
         return img
 
@@ -320,13 +320,13 @@ class augment():
             image = util.random_noise(img, mode='gaussian', clip=True)
 
         elif noise_typ == 1: #salt
-            image = util.random_noise(img, mode='salt', amount=random.randrange(10,85, 15)/100, clip=True)
+            image = util.random_noise(img, mode='salt', amount=random.randrange(7,65, 7)/100, clip=True)
 
         elif noise_typ == 2: #pepper
-            image = util.random_noise(img, mode='pepper', amount=random.randrange(10,85, 15)/100, clip=True)
+            image = util.random_noise(img, mode='pepper', amount=random.randrange(7,65, 7)/100, clip=True)
 
         elif noise_typ == 3: #s&p
-            image = util.random_noise(img, mode='s&p', amount=random.randrange(10,85, 15)/100, clip=True)
+            image = util.random_noise(img, mode='s&p', amount=random.randrange(7,65, 7)/100, clip=True)
 
         elif noise_typ == 4: #speckle
             image = util.random_noise(img, mode='speckle', clip=True)
@@ -480,10 +480,10 @@ class augment():
             elif(type_diverse == 'flip'):
                 f_type = -1
                 mask_img = cv2.flip(mask_img, f_type)
-            elif(type_diverse == 'vlip'):
+            elif(type_diverse == 'vflip'):
                 f_type = 0
                 mask_img = cv2.flip(mask_img, f_type)
-            elif(type_diverse == 'hlip'):
+            elif(type_diverse == 'hflip'):
                 f_type = 1
                 mask_img = cv2.flip(mask_img, f_type)
 

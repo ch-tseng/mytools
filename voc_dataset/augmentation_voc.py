@@ -6,8 +6,8 @@ import numpy as np
 from augvoc import augment
 from tqdm import tqdm
 
-dataset_base = r'/WORKING/road_defects_d20_d21'
-output_base = r'/WORKING/road_defects_d20_d21/aug'
+dataset_base = r'/WORKING/Jackson_v2_road_defects/dataset'
+output_base = r'/WORKING/Jackson_v2_road_defects/dataset/aug'
 
 dataset_base = dataset_base.replace('\\', '/')
 output_base = output_base.replace('\\', '/')
@@ -22,7 +22,7 @@ output_aug_labels = os.path.join(output_base, 'aug_labels')
 output_aug_negs = os.path.join(output_base, 'aug_negatives')
 
 threshold_wh = (30,30)  #min size for augmented box
-gen_aug_negatives = True
+gen_aug_negatives = False
 gen_aug_dataset = True
 gen_mosaic_imgs = True
 img_aug_count = 1
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
                 for count_num in range(0, img_aug_count):
                     #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'flip', 5:'shift' }
-                    ways = {0: 'no_change', 2:'rotate180', 4:'flip' }
+                    ways = {0: 'no_change', 1:'flip' }
                     for con_id in ways:
                         cimg = cv2.imread(image_path)
                         try:
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
                         cimg = augmentation.do_imgchange(cimg, ways[con_id])
                         #for way_id in [ 0, 1, 2, 3, 4, 5, 6]:
-                        for way_id in [ 0, 4, 5, 6, 9, 11]:
+                        for way_id in [ 0, 1, 3, 4, 5, 6, 9, 11]:
                             img = cimg.copy()
                             if(way_id == 1):
                                 img = augmentation.draw_lines(img,random.randint(20,50))
@@ -123,7 +123,7 @@ if __name__ == "__main__":
                             elif(way_id == 7):
                                 img = augmentation.do_mosaic(img)
                             elif(way_id == 9):
-                                img = augmentation.do_small_larger(img, s_ratio=0.3)
+                                img = augmentation.do_small_larger(img, s_ratio=0.45)
                             elif(way_id == 11):
                                 img = augmentation.rgb2gray2rgb(img)
 
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
                     for count_num in range(0, img_aug_count):
                         #ways = {0: 'no_change', 1:'rotate90', 2:'rotate180', 3:'rotate270', 4:'hflip', 5:'vflip', 6:'flip', 7:'shift' }
-                        ways = {0: 'no_change', 1:'hflip' }
+                        ways = { 0: 'no_change', 1:'hflip', 2:'shift'  }
                         for con_id in ways:
                             #img_org = cv2.imread(image_path)
                             try:
@@ -188,8 +188,8 @@ if __name__ == "__main__":
                             cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
-                            for way_id in [ 0, 4, 5, 6, 9, 11]:
-                            #for way_id in [ 0,1,2,3 ]:
+                            #for way_id in [ 0, 4, 5, 6, 9, 11]:
+                            for way_id in [ 0, 1, 3, 4, 5, 6, 9, 11 ]:
                                 img = cimg.copy()
                                 if(way_id == 1):
                                     img = augmentation.draw_lines(img,random.randint(5,25))
@@ -216,7 +216,7 @@ if __name__ == "__main__":
 
                                     mimg_path = os.path.join(dataset_images, mfile_name+mfile_ext)
                                     mxml_path = os.path.join(dataset_labels, mfile_name+'.xml')
-                                    mlabelName, mbboxes = augmentation.getLabels(mimg_path, mxml_path)
+                                    mlabelName, mbboxes = augmentation.getLabels(mimg_path, mxml_path, resize_ratio)
                                     img2 = cv2.imread( mimg_path)
                                     img, (w_ratio, h_ratio) = augmentation.merge_img(img, img2)
 
@@ -260,7 +260,7 @@ if __name__ == "__main__":
             augmentation.load_augnegs(output_aug_images)
 
             print('Add 4 images splices') 
-            for file in augmentation.augds_list:
+            for file in tqdm(augmentation.augds_list):
                 augmentation.mosaic_4imgs(file)
 
 
