@@ -478,6 +478,13 @@ class augment():
                 #cv2.waitKey(0)
 
             elif(type_diverse == 'flip'):
+                f_type = -1
+                mask_img = cv2.flip(mask_img, f_type)
+            elif(type_diverse == 'vlip'):
+                f_type = 0
+                mask_img = cv2.flip(mask_img, f_type)
+            elif(type_diverse == 'hlip'):
+                f_type = 1
                 mask_img = cv2.flip(mask_img, f_type)
 
 
