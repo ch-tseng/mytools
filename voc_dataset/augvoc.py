@@ -188,7 +188,7 @@ class augment():
                 point_right_x = random.randint(0, img.shape[1]-1)
                 point_right_y = random.randint(int(4*img.shape[0]/5), img.shape[0]-1)
 
-            alpha = random.randint(3,8) / 10
+            alpha = random.randint(1,6) / 10
             
             cv2.line(overlay, (point_left_x, point_left_y), (point_right_x, point_right_y), color, border)
             image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
@@ -209,7 +209,7 @@ class augment():
             point_left_x = random.randint(0, img.shape[1]-1)
             point_left_y = random.randint(0, img.shape[0]-1)
 
-            alpha = random.randint(3,8) / 10
+            alpha = random.randint(1,6) / 10
            
             cv2.rectangle(overlay, (point_left_x, point_left_y), (point_left_x+width, point_left_y+height), color, border)
             image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
@@ -234,7 +234,7 @@ class augment():
             point_center_x = random.randint(0, img.shape[1]-diameter-1)
             point_center_y = random.randint(0, img.shape[0]-diameter-1)
 
-            alpha = random.randint(3,8) / 10
+            alpha = random.randint(1,6) / 10
             
             cv2.circle(overlay,(point_center_x, point_center_y), diameter, color, border)
             image_new = cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
@@ -270,15 +270,15 @@ class augment():
     def blur_img(self, img):
         b_type = random.randint(0,4)
         if(b_type==0):
-            img = self.averaging_blur(img, size=random.randrange(3,9,2))
+            img = self.averaging_blur(img, size=random.randrange(1,5,2))
         elif(b_type==1):
-            img = self.gaussian_blur(img, size=random.randrange(3,7,2))
+            img = self.gaussian_blur(img, size=random.randrange(1,5,2))
         elif(b_type==2):
-            img = self.median_blur(img, size=random.randrange(3,17,2))
+            img = self.median_blur(img, size=random.randrange(1,11,2))
         elif(b_type==3):
-            img = self.bilateral_blur(img, size=random.randrange(3,17,2),  k1=random.randrange(19,67,2),  k2=random.randrange(19,67,2))
+            img = self.bilateral_blur(img, size=random.randrange(1,11,2),  k1=random.randrange(7,37,2),  k2=random.randrange(7,47,2))
         elif(b_type==4):
-            img = self.motion_blur(img, size=random.randrange(3,7,2))
+            img = self.motion_blur(img, size=random.randrange(1,5,2))
 
         return img
 
@@ -437,7 +437,7 @@ class augment():
             angle = int(type_diverse[6:9])
             #cimg, mask_img = self.do_rotate(img, mask_img, angle)
             
-        if(type_diverse == 'shift'):
+        elif(type_diverse == 'shift'):
             shift_value = 0
             while shift_value == 0:
                 s_type = random.randint(0,2)
@@ -446,16 +446,16 @@ class augment():
 
             #cimg, mask_img = self.do_shift(img, mask_img, s_type, shift_value, shift_range)
 
-        if(type_diverse == 'flip'):
+        elif(type_diverse == 'flip'):
             f_type = -1
             cimg = cv2.flip(img, f_type)
             #mask_img_org = cv2.flip(mask_img, f_type)
 
-        if(type_diverse == 'vflip'):
+        elif(type_diverse == 'vflip'):
             f_type = 0
             cimg = cv2.flip(img, f_type)
 
-        if(type_diverse == 'hflip'):
+        elif(type_diverse == 'hflip'):
             f_type = 1
             cimg = cv2.flip(img, f_type)
 

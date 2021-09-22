@@ -7,7 +7,7 @@ from augvoc import augment
 from tqdm import tqdm
 
 dataset_base = r'/WORKING/Jackson_v2_road_defects/dataset'
-output_base = r'/WORKING/Jackson_v2_road_defects/dataset/aug'
+output_base = r'/WORKING/Jackson_v2_road_defects/dataset/aug3'
 
 dataset_base = dataset_base.replace('\\', '/')
 output_base = output_base.replace('\\', '/')
@@ -183,9 +183,9 @@ if __name__ == "__main__":
                             except:
                                 break
 
-                            labelName, bboxes = augmentation.getLabels(image_path, xml_path, resize_ratio)
+                            labelName, s_bboxes = augmentation.getLabels(image_path, xml_path, resize_ratio)
 
-                            cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, bboxes, labelName, ways[con_id])
+                            cimg, bboxes, labelName = augmentation.get_new_bbox(img_org, s_bboxes, labelName, ways[con_id])
                             #print('way:', ways[con_id]) 
 
                             #for way_id in [ 0, 4, 5, 6, 9, 11]:
@@ -208,7 +208,7 @@ if __name__ == "__main__":
                                 elif(way_id == 8):
                                     img = augmentation.overlay_neg(img, output_aug_negs)
                                 elif(way_id == 9):
-                                    img = augmentation.do_small_larger(img, s_ratio=0.3)
+                                    img = augmentation.do_small_larger(img, s_ratio=0.45)
                                 elif(way_id == 10):
                                     mid, mfile_name, mfile_ext = pick_ds_file(augmentation.ds_list)
                                     while mfile_name==filename:
