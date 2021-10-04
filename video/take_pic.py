@@ -33,7 +33,7 @@ def fps_count(total_frames):
 
 def display_img(img):
     img = cv2.resize(img, (1280, 720))
-    cv2.putText(img, 'FPS:{}'.format( round(fpsnow, 1)), (img.shape[1]-180, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.0,  (0,255,0), 2, cv2.LINE_AA)
+    cv2.putText(img, '{}x{} FPS:{}'.format(width, height, round(fpsnow, 1)), ( img.shape[1]-340, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.0,  (0,255,0), 2, cv2.LINE_AA)
     cv2.putText(img, datenow, (img.shape[1]-320, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8,  (0,255,0), 1, cv2.LINE_AA)
     cv2.putText(img, 'images:{}'.format(i), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0,  (0,255,0), 2, cv2.LINE_AA)
     if write_now is True:
@@ -41,8 +41,8 @@ def display_img(img):
 
     cv2.imshow("dst", img)
 
-cv2.namedWindow("dst", cv2.WND_PROP_FULLSCREEN)
-cv2.setWindowProperty("dst",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+#cv2.namedWindow("dst", cv2.WND_PROP_FULLSCREEN)
+#cv2.setWindowProperty("dst",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 (a,b,screenWidth,screenHeight) = cv2.getWindowImageRect('dst')
 print("LCD's resolution is: %d x %d" % (screenWidth, screenHeight))
 
@@ -51,6 +51,9 @@ camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
 camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
 width = int(camera.get(cv2.CAP_PROP_FRAME_WIDTH))   # float
 height = int(camera.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
+camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+camera.set(cv2.CAP_PROP_FPS, 30)
+
 print("USB Camera's resolution is: %d x %d" % (width, height))
 
 if not os.path.exists(output_path):
