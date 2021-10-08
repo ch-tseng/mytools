@@ -9,7 +9,8 @@ record_type = 'video'  #image, video
 cam_id = 0
 output_path = "pic_takes/"
 video_size = (1920, 1080)  #x,y
-video_rate = 5.0
+length_frames = 10000
+video_rate = 25.0
 
 #----------------------------------------------------
 
@@ -113,8 +114,8 @@ if __name__ == '__main__':
 
             else:
                 if wout is None: wout = new_video(vid)
-                
-                if (record_frames > 1000):
+
+                if (record_frames > length_frames):
                     if vid>0:                        
                         wout.release()
 
