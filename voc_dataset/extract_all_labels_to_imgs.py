@@ -10,10 +10,12 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-extract_to = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final\extract"
-dataset_images = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final\images"
-dataset_labels = r"C:\Users\ch.tseng\iCloudDrive\Model_Sale\crowd_human_water\final\labels"
+extract_to = r"G:\D20_D21\extract"
+dataset_images = r"G:\D20_D21\images"
+dataset_labels = r"G:\D20_D21\labels"
 resize_to = None  #(32, 32)
+label_requires = [ 'D21', 'D41', 'D51', 'D40' ]
+crop_add_padding = 0.25   #add % padding to the copped image
 
 #folderCharacter = "/"  # \\ is for windows
 xml_file = "../auto_label_voc/xml_file.txt"
@@ -110,6 +112,9 @@ for file in os.listdir(dataset_images):
             xml_path = os.path.join(dataset_labels, filename+".xml")
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
+            if labelName not in label_requires:
+                continue
+
             orgImage = cv2.imread(image_path)
             try:
                 test = orgImage.shape
@@ -120,7 +125,24 @@ for file in os.listdir(dataset_images):
             image = orgImage.copy()
             for id, label in enumerate(labelName):
                 cv2.rectangle(image, (labelXmin[id], labelYmin[id]), (labelXmax[id], labelYmax[id]), (0,255,0), 2)
-                label_area = orgImage[labelYmin[id]:labelYmax[id], labelXmin[id]:labelXmax[id]]
+
+                x1, x2, y1, y2 = labelYmin[id], labelXmax[id], labelYmin[id], labelYmax[id]
+                if crop_add_padding>0:
+                    x_padding = int(crop_add_padding * (x2-x1))
+                    y_padding = int(crop_add_padding * (y2-y1))
+
+                    x1 -= x_padding
+                    x2 += x_padding
+                    y1 -= y_padding
+                    y2 += y_padding
+
+                    if x1<0: x1=0
+                    if x2>image.shape[1]: x2=image.shape[1]
+                    if y1<0: y1=0
+                    if y2>image.shape[0]: y2=image.shape[0]
+
+
+                label_area = orgImage[y1:y2, x1:x2]
                 label_img_filename = filename + "_" + str(id) + ".jpg"
                 try:
                     write_lale_images(labelName[id], label_area, extract_to, label_img_filename)
