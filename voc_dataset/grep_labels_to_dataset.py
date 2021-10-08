@@ -10,14 +10,14 @@ from xml.dom import minidom
 
 #-------------------------------------------
 
-want_LABEL_NAME = ["person_head", "person_vbox"]  #rename to new label name
+want_LABEL_NAME = ["D40"]  #rename to new label name
 
 #dataset_images = "F:/Datasets/crowd_human_official_voc/images"
 #dataset_labels = "F:/Datasets/crowd_human_official_voc/labels"
-dataset_images = "F:/Datasets/head_body_Eden/images"
-dataset_labels = "F:/Datasets/head_body_Eden/labels"
+dataset_images = r"G:\Jackson_road\re-labeled\dataset_final\images"
+dataset_labels = r"G:\Jackson_road\re-labeled\dataset_final\labels"
 
-out_path = "F:/Datasets/crowndHuman_2_classes"
+out_path = "g:/ROAD_D40"
 imgPath = "images/"
 labelPath = "labels/"
 
@@ -25,6 +25,8 @@ xml_samplefile = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #-------------------------------------------
+dataset_images = dataset_images.replace('\\', '/')
+dataset_labels = dataset_labels.replace('\\', '/')
 
 def chkEnv():
     if not os.path.exists(out_path):
@@ -135,8 +137,8 @@ def makeDatasetFile(img, img_filename, bboxes):
     jpgFilename = file_name + ".jpg"
     xmlFilename = file_name + ".xml"
 
-    #cv2.imwrite(out_path + imgPath + jpgFilename, img)
-    #print("write to -->", out_path + imgPath + jpgFilename)
+    cv2.imwrite( os.path.join(out_path, imgPath, jpgFilename), img)
+    print("write to -->", os.path.join(out_path, imgPath, jpgFilename))
 
     xmlContent = generateXML(img, xmlFilename, os.path.join(out_path, labelPath, xmlFilename), bboxes)
     file = open(os.path.join(out_path, labelPath, xmlFilename), "w")
