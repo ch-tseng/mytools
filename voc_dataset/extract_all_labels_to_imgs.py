@@ -112,9 +112,6 @@ for file in os.listdir(dataset_images):
             xml_path = os.path.join(dataset_labels, filename+".xml")
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
-            if len(label_requires)>0 and labelName not in label_requires:
-                continue
-
             orgImage = cv2.imread(image_path)
             try:
                 test = orgImage.shape
@@ -124,6 +121,9 @@ for file in os.listdir(dataset_images):
                 
             image = orgImage.copy()
             for id, label in enumerate(labelName):
+                if len(label_requires)>0 and label not in label_requires:
+                    continue
+
                 cv2.rectangle(image, (labelXmin[id], labelYmin[id]), (labelXmax[id], labelYmax[id]), (0,255,0), 2)
 
                 x1, x2, y1, y2 = labelYmin[id], labelXmax[id], labelYmin[id], labelYmax[id]
@@ -149,7 +149,7 @@ for file in os.listdir(dataset_images):
                 except:
                     continue
 
-            #cv2.imshow("Image", imutils.resize(image, width=700))
+            cv2.imshow("Image", imutils.resize(image, width=700))
             k = cv2.waitKey(1)
 
 
