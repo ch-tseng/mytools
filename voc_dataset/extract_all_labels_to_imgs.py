@@ -14,7 +14,8 @@ extract_to = r"G:\D20_D21\extract"
 dataset_images = r"G:\D20_D21\images"
 dataset_labels = r"G:\D20_D21\labels"
 resize_to = None  #(32, 32)
-label_requires = [ 'D21', 'D41', 'D51', 'D40' ]  #[] = all
+#label_requires = [ 'D21', 'D41', 'D51', 'D40' ]  #[] = all
+label_requires = ['D20', 'D21']
 crop_add_padding = 0.25   #add % padding to the copped image
 
 #folderCharacter = "/"  # \\ is for windows
@@ -126,7 +127,7 @@ for file in os.listdir(dataset_images):
 
                 cv2.rectangle(image, (labelXmin[id], labelYmin[id]), (labelXmax[id], labelYmax[id]), (0,255,0), 2)
 
-                x1, x2, y1, y2 = labelYmin[id], labelXmax[id], labelYmin[id], labelYmax[id]
+                x1, x2, y1, y2 = labelXmin[id], labelXmax[id], labelYmin[id], labelYmax[id]
                 if crop_add_padding>0:
                     x_padding = int(crop_add_padding * (x2-x1))
                     y_padding = int(crop_add_padding * (y2-y1))
