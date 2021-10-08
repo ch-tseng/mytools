@@ -14,7 +14,7 @@ extract_to = r"G:\D20_D21\extract"
 dataset_images = r"G:\D20_D21\images"
 dataset_labels = r"G:\D20_D21\labels"
 resize_to = None  #(32, 32)
-label_requires = [ 'D21', 'D41', 'D51', 'D40' ]
+label_requires = [ 'D21', 'D41', 'D51', 'D40' ]  #[] = all
 crop_add_padding = 0.25   #add % padding to the copped image
 
 #folderCharacter = "/"  # \\ is for windows
@@ -112,7 +112,7 @@ for file in os.listdir(dataset_images):
             xml_path = os.path.join(dataset_labels, filename+".xml")
             labelName, labelXmin, labelYmin, labelXmax, labelYmax = getLabels(image_path, xml_path)
 
-            if labelName not in label_requires:
+            if len(label_requires)>0 and labelName not in label_requires:
                 continue
 
             orgImage = cv2.imread(image_path)
