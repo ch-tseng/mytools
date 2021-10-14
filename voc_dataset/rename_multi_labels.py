@@ -13,12 +13,12 @@ from xml.dom import minidom
 #org_LABEL_NAME = "minibuss"  #*--> all labels
 #new_LABEL_NAME = "bus"  #rename to new label name
 LABEL_UPDATE = False
-LABEL_NAME_UPDATE = { "I":"1", "O":"0", "Z":"2", "B":"8" }
+LABEL_NAME_UPDATE = { "minibuss":"minibus" }
 
-dataset_images = "D:/works/car_plate_chars/images"
-dataset_labels = "D:/works/car_plate_chars/labels"
+dataset_images = r"L:\Dataset\Mine\Vehicles\Eden_vehicles_plates\Eden_original/images"
+dataset_labels = r"L:\Dataset\Mine\Vehicles\Eden_vehicles_plates\Eden_original/labels"
 
-out_path = "D:/works/car_plate_chars_20201026_2"
+out_path = r"L:\Dataset\Mine\Vehicles\Eden_vehicles_plates\Eden_original\renamed"
 imgPath = "images/"
 labelPath = "labels/"
 
@@ -26,6 +26,10 @@ xml_samplefile = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #-------------------------------------------
+
+dataset_images = dataset_images.replace('\\', '/')
+dataset_labels = dataset_labels.replace('\\', '/')
+out_path = out_path.replace('\\', '/')
 
 def chkEnv():
     if not os.path.exists(out_path):
