@@ -8,33 +8,39 @@ from xml.dom import minidom
 #ds_images_path include 'labels' and 'images'
 ds_path = r'D:\temp\dataset_new\org_dataset'
 user_works = {
-                'Linda': ( ['0','nose'], r'D:\temp\dataset_new\linda\labels'),
-                'John':( ['person_head','face'], r'D:\temp\dataset_new\John\labels'),
-                'Mary':( ['mouth'], r'D:\temp\dataset_new\John\labels')
+                'Linda': ( ['face','mouth'], r'D:\temp\dataset_new\linda\labels'),
+                'John':( ['0','eye'], r'D:\temp\dataset_new\John\labels'),
+                'Mary':( ['nose'], r'D:\temp\dataset_new\John\labels')
             }
 
 output_ds_path = r'D:\temp\dataset_new\combined_dataset'
 
 
 def get_img(INPUT):
-    global img_id
-
-    frame = None
+    global img_id    
     frame_ok = False
+    frame = None
     frame_name = None
     w,h = None, None
-    if img_id<len(INPUT):
-        while frame_ok is False and img_id<len(INPUT):
 
+    if img_id<len(INPUT):
+        
+        while frame_ok is False and img_id<len(INPUT):
+            frame = None            
+            frame_name = None
+            w,h = None, None
             file_path = INPUT[img_id]
             frame = cv2.imread(file_path)
             img_id += 1
-            frame_ok = True
+            
             try:
-                (h,w,_) = frame.shape               
+                (h,w,_) = frame.shape 
+                frame_ok = True     
+
 
             except:
-                print('error image, cannot read:', INPUT[img_id])                
+                print('error image, cannot read:', INPUT[img_id])   
+                frame_ok = False             
                 continue
 
         frame_name = os.path.basename(file_path)
@@ -117,6 +123,9 @@ if __name__ == "__main__":
     print('Push Q to quit the program.')
     while True:
         hasFrame, frame, frame_name, (width, height) = get_img(img_list)
+        if  hasFrame is not True:
+            break
+
         img = frame.copy()
         file_name, ext_name = os.path.splitext(frame_name) 
 
@@ -159,6 +168,7 @@ if __name__ == "__main__":
         cv2.imwrite( os.path.join(output_img_path, frame_name), frame)
 
         cv2.imshow('test', imutils.resize(img, height=400))
+        print('ok')
         k = cv2.waitKey(1)
         if(k==113):
             break
