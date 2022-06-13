@@ -14,11 +14,11 @@ org_LABEL_NAME = "*"  #*--> rename all the labels, not a specified label
 new_LABEL_NAME = "food"  #rename to this new label name
 
 #path for the dataset to be renamed
-dataset_images = "/DATA1/Datasets_projects/Diabnext/images/"
-dataset_labels = "/DATA1/Datasets_projects/Diabnext/labels/"
+dataset_images = r"F:\ModelSale_2022\face_mask_eyeball\dataset\images/"
+dataset_labels = r"F:\ModelSale_2022\face_mask_eyeball\dataset\labels/"
 
 #path for the dataset to be generated.
-out_path = "/DATA1/Datasets_projects/Diabnext_only_food/"
+out_path = r"F:\ModelSale_2022\face_mask_eyeball\renamed/"
 imgPath = "images/"
 labelPath = "labels/"
 
@@ -26,6 +26,10 @@ xml_samplefile = "xml_file.txt"
 object_xml_file = "xml_object.txt"
 
 #-------------------------------------------
+
+dataset_images = dataset_images.replace('\\', '/')
+dataset_labels = dataset_labels.replace('\\', '/')
+out_path = out_path.replace('\\', '/')
 
 def chkEnv():
     if not os.path.exists(out_path):
