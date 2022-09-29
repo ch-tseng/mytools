@@ -11,15 +11,21 @@ import sys
 import time
 import datetime
 
-videoFile = "/Users/chtseng/works/IMG_3492.mov"
-framesSavePath = "/Users/chtseng/Downloads/vehicles"
+videoFile = r"/DS/medias/videos/Human/marry.mp4"
+framesSavePath = r"/DS/medias/temp/marry"
 append_prefix_filename = "a"
 resizeWidth = 0
 rotate = 0
-interval = 72 #frames
+interval = 1 #frames
+max_frames = 1000
 #----------------------------------------
+videoFile = videoFile.replace('\\', '/')
+framesSavePath = framesSavePath.replace('\\', '/')
+
 if not os.path.exists(framesSavePath):
     os.makedirs(framesSavePath)
+
+
 
 camera = cv2.VideoCapture(videoFile)
 
@@ -32,7 +38,8 @@ while(camera.isOpened()):
 
 
     if(grabbed is True):
-        cv2.imshow("Frame", imutils.resize(img, width=300))
+        #cv2.imshow("Frame", imutils.resize(img, width=300))
+        if frameid>max_frames: break
         k = cv2.waitKey(1)
         if(k==113):
             break
